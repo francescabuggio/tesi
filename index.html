@@ -804,12 +804,6 @@
       likertGroups.push(likertQuestions.slice(i, i + LIKERT_PER_PAGE));
     }
 
-    // Dividi domande finali Likert in gruppi di 5
-    const finalLikertGroups = [];
-    for (let i = 0; i < finalLikertQuestions.length; i += LIKERT_PER_PAGE) {
-      finalLikertGroups.push(finalLikertQuestions.slice(i, i + LIKERT_PER_PAGE));
-    }
-
     // Final survey questions
     const finalSurveyQuestions = [
       {
@@ -871,6 +865,12 @@
       'Molto d\'accordo',
       'Totalmente d\'accordo'
     ];
+
+    // Dividi domande finali Likert in gruppi di 5
+    const finalLikertGroups = [];
+    for (let i = 0; i < finalLikertQuestions.length; i += LIKERT_PER_PAGE) {
+      finalLikertGroups.push(finalLikertQuestions.slice(i, i + LIKERT_PER_PAGE));
+    }
 
     // Survey functions
     function renderSurvey() {
