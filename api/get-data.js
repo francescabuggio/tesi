@@ -62,7 +62,8 @@ module.exports = async function handler(req, res) {
       productDistribution: calculateProductDistribution(surveyData),
       deliveryDistribution: calculateDeliveryDistribution(surveyData),
       checkoutTimeRanges: calculateCheckoutTimeRanges(surveyData),
-      checkoutVariantDistribution: calculateCheckoutVariantDistribution(surveyData)
+      checkoutVariantDistribution: calculateCheckoutVariantDistribution(surveyData),
+      averageCheckoutTime: calculateAverageCheckoutTime(surveyData)
     };
 
     console.log('Statistics calculated:', stats);
@@ -215,4 +216,21 @@ function calculateCheckoutVariantDistribution(data) {
   });
   
   return distribution;
+}
+
+function calculateAverageCheckoutTime(data) {
+  const times = data
+    .filter(function(item) { 
+      return item.orderData && item.orderData.checkoutTimeSpent && item.orderData.checkoutTimeSpent > 0; 
+    })
+    .map(function(item) { 
+      return item.orderData.checkoutTimeSpent; 
+    });
+  
+  if (times.length === 0) return "Nessun dato";
+  
+  const avgMs = times.reduce(function(sum, time) { return sum + time; }, 0) / times.length;
+  const avgSeconds = Math.round(avgMs / 1000);
+  
+  return `${avgSeconds}s (media su ${times.length} checkout)`;
 } 

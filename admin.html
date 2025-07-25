@@ -138,7 +138,7 @@
 </head>
 <body>
   <div class="header">
-    <h1>📊 Dashboard Survey Results</h1>
+    <h1>🏺 Terracotta Dreams - Analytics Dashboard</h1>
   </div>
 
   <div class="container">
@@ -164,6 +164,10 @@
         <div class="stat-card">
           <div class="stat-value" id="completion-rate">-</div>
           <div class="stat-label">Tasso Completamento</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="avg-checkout-time">-</div>
+          <div class="stat-label">Tempo Medio Checkout</div>
         </div>
       </div>
 
@@ -273,6 +277,7 @@
       document.getElementById('last-update').textContent = 
         stats.lastUpdate ? new Date(stats.lastUpdate).toLocaleDateString('it-IT') : 'Mai';
       document.getElementById('completion-rate').textContent = '100%'; // Placeholder
+      document.getElementById('avg-checkout-time').textContent = stats.averageCheckoutTime || '-';
     }
 
     function createCharts(stats) {
@@ -458,42 +463,84 @@
     function viewDetails(index) {
       const item = surveyData[index];
       
-      // Crea una finestra popup con i dettagli formattati
+      // Crea una finestra popup con TUTTI i dettagli formattati
       const details = `
-═══════════════════════════
-📊 DETTAGLI RISPOSTA
-═══════════════════════════
+═══════════════════════════════════════
+📊 DETTAGLI COMPLETI RISPOSTA
+═══════════════════════════════════════
 
-🆔 Session ID: ${item.sessionId || 'N/A'}
-📅 Data: ${new Date(item.timestamp).toLocaleString('it-IT')}
-⏱️ Tempo totale: ${item.totalTimeSpent ? Math.round(item.totalTimeSpent / 60000) + ' minuti' : 'N/A'}
+🆔 IDENTIFICATORI:
+• Session ID: ${item.sessionId || 'N/A'}
+• Timestamp: ${item.timestamp || 'N/A'}
+• Data locale: ${new Date(item.timestamp).toLocaleString('it-IT')}
+• Completato il: ${item.completedAt || 'N/A'}
 
-📋 SURVEY INIZIALE:
+⏱️ ANALISI TEMPORALE:
+• Tempo totale (ms): ${item.totalTimeSpent || 'N/A'}
+• Tempo totale (minuti): ${item.totalTimeSpent ? Math.round(item.totalTimeSpent / 60000) + ' min' : 'N/A'}
+• Survey iniziale completato: ${item.initialSurveyCompletedAt || 'N/A'}
+• Ecommerce iniziato: ${item.ecommerceStartedAt || 'N/A'}
+• Survey finale completato: ${item.finalSurveyCompletedAt || 'N/A'}
+• Tempo nel checkout: ${item.orderData?.checkoutTimeSpent ? Math.round(item.orderData.checkoutTimeSpent / 1000) + ' secondi (' + item.orderData.checkoutTimeSpent + ' ms)' : 'N/A'}
+
+📋 SURVEY INIZIALE COMPLETO:
 • Età: ${item.initialSurvey?.age || 'N/A'}
 • Genere: ${item.initialSurvey?.gender || 'N/A'}
 • Educazione: ${item.initialSurvey?.education || 'N/A'}
 • Dispositivo: ${item.initialSurvey?.device || 'N/A'}
 • Situazione finanziaria: ${item.initialSurvey?.financial || 'N/A'}
 • Frequenza acquisti: ${item.initialSurvey?.frequency || 'N/A'}
+• Si stanca facilmente: ${item.initialSurvey?.get_tired !== undefined ? item.initialSurvey.get_tired : 'N/A'}
+• Apre troppe tabs: ${item.initialSurvey?.open_tabs !== undefined ? item.initialSurvey.open_tabs : 'N/A'}
+• Vuole risparmiare tempo: ${item.initialSurvey?.save_time !== undefined ? item.initialSurvey.save_time : 'N/A'}
+• Evita difficoltà: ${item.initialSurvey?.avoid_hassle !== undefined ? item.initialSurvey.avoid_hassle : 'N/A'}
+• Facilità confronto: ${item.initialSurvey?.easy_compare !== undefined ? item.initialSurvey.easy_compare : 'N/A'}
+• Finisce su altri siti: ${item.initialSurvey?.end_up_sites !== undefined ? item.initialSurvey.end_up_sites : 'N/A'}
+• Facilità trovare siti: ${item.initialSurvey?.find_website !== undefined ? item.initialSurvey.find_website : 'N/A'}
+• Shopping facile: ${item.initialSurvey?.easy_shopping !== undefined ? item.initialSurvey.easy_shopping : 'N/A'}
+• Scarica file: ${item.initialSurvey?.download_files !== undefined ? item.initialSurvey.download_files : 'N/A'}
+• Si diverte a fare shopping: ${item.initialSurvey?.enjoy_shopping !== undefined ? item.initialSurvey.enjoy_shopping : 'N/A'}
+• Compra prodotti non disponibili: ${item.initialSurvey?.buy_unavailable !== undefined ? item.initialSurvey.buy_unavailable : 'N/A'}
+• Stress finanziario: ${item.initialSurvey?.stress_financial !== undefined ? item.initialSurvey.stress_financial : 'N/A'}
+• Struttura confusa: ${item.initialSurvey?.confusing_structure !== undefined ? item.initialSurvey.confusing_structure : 'N/A'}
 
-🛒 DATI ECOMMERCE:
+🛒 DATI ECOMMERCE COMPLETI:
 • Prodotto scelto: ${item.orderData?.productTitle || 'N/A'}
 • ID Prodotto: ${item.orderData?.productId || 'N/A'}
+• Prezzo prodotto: ${item.orderData?.productPrice || 'N/A'}
+• Nome: ${item.orderData?.firstName || 'N/A'}
+• Cognome: ${item.orderData?.lastName || 'N/A'}
+• Indirizzo spedizione: ${item.orderData?.shippingAddress || 'N/A'}
 • Metodo consegna: ${item.orderData?.deliveryMethod || 'N/A'}
-• Tempo nel checkout: ${item.orderData?.checkoutTimeSpent ? Math.round(item.orderData.checkoutTimeSpent / 1000) + ' secondi' : 'N/A'}
+• Valore delivery: ${item.orderData?.deliveryValue || 'N/A'}
+• Ordine completato: ${item.orderData?.orderCompletedAt || 'N/A'}
+
+🎯 DATI CHECKOUT:
 • Variante checkout: ${item.checkoutData?.variant || 'N/A'}
+• Prodotto checkout: ${item.checkoutData?.product ? JSON.stringify(item.checkoutData.product, null, 2) : 'N/A'}
+• Checkout iniziato: ${item.checkoutData?.checkoutStartedAt || 'N/A'}
+• Click data: ${item.checkoutData?.productClickData ? JSON.stringify(item.checkoutData.productClickData, null, 2) : 'N/A'}
 
 📱 INTERAZIONI PRODOTTI:
 ${item.productInteractions ? Object.entries(item.productInteractions).map(([productId, data]) => 
   `• Prodotto ${productId}: ${data.clickCount} click, primo click: ${new Date(data.firstClickAt).toLocaleString('it-IT')}`
 ).join('\n') : '• Nessuna interazione tracciata'}
 
-📝 SURVEY FINALE:
+📝 SURVEY FINALE COMPLETO:
 • Considerazione ambientale: ${item.finalSurvey?.environmental_consideration || 'N/A'}
-• Difficoltà overview: ${item.finalSurvey?.difficult_overview || 'N/A'}
-• Descrizioni utili: ${item.finalSurvey?.useful_descriptions || 'N/A'}
+• Si sente colpevole: ${item.finalSurvey?.feel_guilty !== undefined ? item.finalSurvey.feel_guilty : 'N/A'}
+• Design difficile: ${item.finalSurvey?.difficult_design !== undefined ? item.finalSurvey.difficult_design : 'N/A'}
+• Si sente responsabile: ${item.finalSurvey?.feel_responsible !== undefined ? item.finalSurvey.feel_responsible : 'N/A'}
+• Opzioni difficili: ${item.finalSurvey?.difficult_options !== undefined ? item.finalSurvey.difficult_options : 'N/A'}
+• Sforzo per capire: ${item.finalSurvey?.effort_understand !== undefined ? item.finalSurvey.effort_understand : 'N/A'}
+• Overview difficile: ${item.finalSurvey?.difficult_overview !== undefined ? item.finalSurvey.difficult_overview : 'N/A'}
+• Si sente irresponsabile: ${item.finalSurvey?.feel_irresponsible !== undefined ? item.finalSurvey.feel_irresponsible : 'N/A'}
+• Descrizioni utili: ${item.finalSurvey?.useful_descriptions !== undefined ? item.finalSurvey.useful_descriptions : 'N/A'}
 
-═══════════════════════════
+🔧 DATI RAW (JSON):
+${JSON.stringify(item, null, 2)}
+
+═══════════════════════════════════════
       `;
       
       alert(details);

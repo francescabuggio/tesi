@@ -3,36 +3,39 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SportPlanet Survey</title>
+  <title>Terracotta Dreams - Ceramiche Artigianali</title>
   <style>
     * {
       box-sizing: border-box;
     }
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Georgia', 'Times New Roman', serif;
       margin: 0;
       padding: 0;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #f5f1eb 0%, #e8ddd4 50%, #d4c4b0 100%);
       min-height: 100vh;
+      color: #3c2e26;
     }
     
     /* Survey Styles */
     .survey-container {
       max-width: 700px;
       margin: 2rem auto;
-      background: rgba(255,255,255,0.95);
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      background: rgba(255,251,245,0.95);
+      border-radius: 20px;
+      box-shadow: 0 12px 40px rgba(60,46,38,0.15);
       padding: 2.5rem;
       backdrop-filter: blur(10px);
+      border: 1px solid rgba(139,105,82,0.2);
     }
     .survey-header {
-      background: #1e88e5;
-      color: white;
+      background: linear-gradient(135deg, #8b6952 0%, #6d4c36 100%);
+      color: #fff5eb;
       padding: 1.5rem;
-      border-radius: 12px;
+      border-radius: 16px;
       margin-bottom: 2rem;
       text-align: center;
+      box-shadow: 0 4px 16px rgba(60,46,38,0.3);
     }
     .survey-header h1 {
       margin: 0;
@@ -42,9 +45,10 @@
     .question-group {
       margin-bottom: 2.5rem;
       padding: 1.5rem;
-      background: #f8f9fa;
-      border-radius: 12px;
-      border-left: 4px solid #1e88e5;
+      background: rgba(255,248,240,0.8);
+      border-radius: 16px;
+      border-left: 4px solid #8b6952;
+      box-shadow: 0 2px 12px rgba(60,46,38,0.08);
     }
     .question-title {
       font-size: 1.1rem;
@@ -69,12 +73,14 @@
       transition: all 0.3s ease;
     }
     .radio-option:hover {
-      border-color: #1e88e5;
-      background: #f0f7ff;
+      border-color: #8b6952;
+      background: #fff8f0;
+      box-shadow: 0 2px 8px rgba(139,105,82,0.15);
     }
     .radio-option.selected {
-      border-color: #1e88e5;
-      background: #e3f2fd;
+      border-color: #8b6952;
+      background: #f4ebe1;
+      box-shadow: 0 2px 12px rgba(139,105,82,0.2);
     }
     .radio-option input[type="radio"] {
       margin-right: 0.8rem;
@@ -256,18 +262,21 @@
     }
     header h1 {
       margin: 0;
-      font-size: 2.2rem;
-      font-weight: 300;
-      letter-spacing: 2px;
+      font-size: 2.5rem;
+      font-weight: 400;
+      letter-spacing: 1px;
+      color: #6d4c36;
+      text-shadow: 2px 2px 4px rgba(60,46,38,0.2);
     }
     .container {
       max-width: 1000px;
       margin: 2rem auto;
-      background: rgba(255,255,255,0.95);
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      background: rgba(255,251,245,0.95);
+      border-radius: 20px;
+      box-shadow: 0 12px 40px rgba(60,46,38,0.15);
       padding: 2.5rem;
       backdrop-filter: blur(10px);
+      border: 1px solid rgba(139,105,82,0.2);
     }
     .page-title {
       text-align: center;
@@ -283,25 +292,30 @@
       justify-items: center;
     }
     .product-card {
-      background: linear-gradient(145deg, #ffffff, #f0f0f0);
-      border-radius: 16px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      background: linear-gradient(145deg, #fff8f0, #f4ebe1);
+      border-radius: 20px;
+      box-shadow: 0 6px 20px rgba(60,46,38,0.12);
       width: 100%;
       max-width: 280px;
       padding: 1.5rem;
       text-align: center;
       cursor: pointer;
       transition: all 0.3s ease;
-      border: 1px solid rgba(255,255,255,0.2);
+      border: 1px solid rgba(139,105,82,0.15);
     }
     .product-card:hover {
       transform: translateY(-8px);
-      box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+      box-shadow: 0 12px 36px rgba(60,46,38,0.25);
+      border-color: rgba(139,105,82,0.3);
     }
-    .product-emoji {
-      font-size: 4rem;
-      margin-bottom: 1rem;
+    .product-image {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 16px;
+      margin: 0 auto 1rem;
       display: block;
+      box-shadow: 0 4px 12px rgba(60,46,38,0.15);
     }
     .product-title {
       font-size: 1.1rem;
@@ -350,10 +364,14 @@
       max-width: 500px;
       margin: 0 auto;
     }
-    .product-detail-emoji {
-      font-size: 8rem;
-      margin-bottom: 1.5rem;
+    .product-detail-image {
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 20px;
+      margin: 0 auto 1.5rem;
       display: block;
+      box-shadow: 0 8px 24px rgba(60,46,38,0.2);
     }
     .product-detail-title {
       font-size: 2rem;
@@ -390,8 +408,12 @@
       padding-bottom: 1rem;
       border-bottom: 1px solid #eee;
     }
-    .checkout-emoji {
-      font-size: 3.5rem;
+    .checkout-image {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(60,46,38,0.15);
     }
     .checkout-info h3 {
       margin: 0 0 0.5rem 0;
@@ -608,31 +630,35 @@
     let productClickTimes = {}; // Per tracciare tempi di click sui prodotti
     let surveyStartTime = Date.now();
 
-    // Prodotti
+    // Prodotti Ceramiche Artigianali
     const products = [
       {
         id: 1,
-        title: "Maglietta FC Barcelona 2023/24",
-        price: "€29,90",
-        description: "Maglia ufficiale Home stagione 2023/24. Tessuto tecnico, colori vivaci."
+        title: "Tazza Speckled Bianca",
+        price: "€24,90",
+        image: "product1.png",
+        description: "Tazza artigianale in ceramica con delicati puntini neri. Ogni pezzo è unico, modellato a mano con argilla locale di alta qualità. Perfetta per il tuo rituale del caffè mattutino."
       },
       {
         id: 2,
-        title: "Maglietta Juventus 2023/24", 
-        price: "€29,90",
-        description: "Maglia ufficiale Home stagione 2023/24. Tessuto tecnico, colori vivaci."
+        title: "Set Ciotole Splash Blu", 
+        price: "€45,90",
+        image: "product2.png",
+        description: "Elegante set di due ciotole in ceramica con affascinante pattern splash blu. Ideali per servire o come raffinato elemento decorativo. Realizzate con smalti naturali."
       },
       {
         id: 3,
-        title: "Maglietta Manchester United 2023/24",
-        price: "€29,90",
-        description: "Maglia ufficiale Home stagione 2023/24. Tessuto tecnico, colori vivaci."
+        title: "Teiera Galaxy Nera",
+        price: "€65,90",
+        image: "product3.png",
+        description: "Straordinaria teiera artigianale con suggestivo effetto galaxy. Argilla nera impreziosita da riflessi dorati. Un vero pezzo d'arte per le tue cerimonie del tè."
       },
       {
         id: 4,
-        title: "Maglietta Paris Saint-Germain 2023/24",
-        price: "€29,90",
-        description: "Maglia ufficiale Home stagione 2023/24. Tessuto tecnico, colori vivaci."
+        title: "Tazza Constellation",
+        price: "€28,90",
+        image: "product1.png",
+        description: "Tazza unica con poetico motivo a costellazione. Ogni puntino racconta una storia millenaria. Realizzata con antiche tecniche di ceramica tradizionale."
       }
     ];
 
@@ -968,16 +994,16 @@
           <h2 class="scenario-title">Descrizione Scenario</h2>
           <div class="scenario-content">
             <p class="scenario-text">
-              «È <span class="scenario-highlight">martedì pomeriggio</span>. Hai ricevuto via e-mail un 
-              <span class="scenario-highlight">buono regalo da 30 €</span> da usare sullo shop 
-              <span class="shop-name">SportPlanet</span> entro <span class="scenario-highlight">48 ore</span>. 
-              Tuo nipote compie <span class="scenario-highlight">9 anni venerdì sera</span>, quando vi 
-              ritroverete tutti a cena per la festa. Vorresti fargli un piccolo regalo sportivo 
-              approfittando del buono.»
+              «È <span class="scenario-highlight">domenica mattina</span>. Hai ricevuto via e-mail un 
+              <span class="scenario-highlight">buono regalo da 50 €</span> da usare sullo shop di ceramiche 
+              <span class="shop-name">Terracotta Dreams</span> entro <span class="scenario-highlight">72 ore</span>. 
+              La tua migliore amica compie <span class="scenario-highlight">30 anni sabato prossimo</span>, e 
+              sta arredando la sua nuova casa. Vorresti regalarle un pezzo di ceramica artigianale 
+              che possa valorizzare la sua cucina.»
             </p>
           </div>
           <button class="scenario-button" onclick="startEcommerce()">
-            Vai al negozio SportPlanet 🏪
+            Esplora Terracotta Dreams 🏺
           </button>
         </div>
       `;
@@ -988,7 +1014,7 @@
       const app = document.getElementById('app-content');
       app.innerHTML = `
         <header>
-          <h1>SportPlanet</h1>
+          <h1>Terracotta Dreams</h1>
         </header>
         <div class="container" id="main-content">
           <!-- Content will be injected here -->
@@ -1001,11 +1027,11 @@
     function renderHome() {
       const main = document.getElementById('main-content');
       main.innerHTML = `
-        <h2 class="page-title">Prodotti in evidenza</h2>
+        <h2 class="page-title">🏺 Ceramiche Artigianali</h2>
         <div class="products">
           ${products.map(p => `
             <div class="product-card" onclick="showProduct(${p.id})">
-              <span class="product-emoji">👕</span>
+              <img src="${p.image}" alt="${p.title}" class="product-image">
               <div class="product-title">${p.title}</div>
               <div class="product-price">${p.price}</div>
             </div>
@@ -1019,7 +1045,7 @@
       main.innerHTML = `
         <div class="product-detail">
           <button class="btn btn-secondary" onclick="renderHome()">← Torna ai prodotti</button>
-          <span class="product-detail-emoji">👕</span>
+          <img src="${product.image}" alt="${product.title}" class="product-detail-image">
           <h2 class="product-detail-title">${product.title}</h2>
           <div class="product-detail-price">${product.price}</div>
           <p class="product-detail-desc">${product.description}</p>
@@ -1069,7 +1095,7 @@
         <button class="btn btn-secondary" onclick="showProduct(${product.id})">← Indietro</button>
         <div class="checkout-container">
           <div class="checkout-header">
-            <span class="checkout-emoji">👕</span>
+            <img src="${product.image}" alt="${product.title}" class="checkout-image">
             <div class="checkout-info">
               <h3>${product.title}</h3>
               <p class="price">${product.price}</p>
