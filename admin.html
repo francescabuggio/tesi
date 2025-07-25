@@ -181,6 +181,30 @@
             <canvas id="genderChart"></canvas>
           </div>
         </div>
+        <div class="chart-card">
+          <div class="chart-title">Prodotti Scelti</div>
+          <div class="chart-container">
+            <canvas id="productChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Metodi di Spedizione</div>
+          <div class="chart-container">
+            <canvas id="deliveryChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Tempo nel Checkout</div>
+          <div class="chart-container">
+            <canvas id="checkoutTimeChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Varianti Checkout</div>
+          <div class="chart-container">
+            <canvas id="checkoutVariantChart"></canvas>
+          </div>
+        </div>
       </div>
 
       <!-- Data Table -->
@@ -197,8 +221,9 @@
                 <th>Session ID</th>
                 <th>Età</th>
                 <th>Genere</th>
-                <th>Educazione</th>
-                <th>Dispositivo</th>
+                <th>Prodotto</th>
+                <th>Spedizione</th>
+                <th>Tempo Checkout</th>
                 <th>Tempo Totale</th>
                 <th>Azioni</th>
               </tr>
@@ -215,6 +240,10 @@
     let surveyData = [];
     let ageChart = null;
     let genderChart = null;
+    let productChart = null;
+    let deliveryChart = null;
+    let checkoutTimeChart = null;
+    let checkoutVariantChart = null;
 
     async function loadData() {
       try {
@@ -248,12 +277,12 @@
 
     function createCharts(stats) {
       // Distruggi i grafici esistenti prima di crearne di nuovi
-      if (ageChart) {
-        ageChart.destroy();
-      }
-      if (genderChart) {
-        genderChart.destroy();
-      }
+      if (ageChart) ageChart.destroy();
+      if (genderChart) genderChart.destroy();
+      if (productChart) productChart.destroy();
+      if (deliveryChart) deliveryChart.destroy();
+      if (checkoutTimeChart) checkoutTimeChart.destroy();
+      if (checkoutVariantChart) checkoutVariantChart.destroy();
 
       // Age Chart
       const ageCtx = document.getElementById('ageChart').getContext('2d');
@@ -301,6 +330,96 @@
           }
         }
       });
+
+      // Product Chart
+      const productCtx = document.getElementById('productChart').getContext('2d');
+      productChart = new Chart(productCtx, {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(stats.productDistribution),
+          datasets: [{
+            data: Object.values(stats.productDistribution),
+            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
+      });
+
+      // Delivery Chart
+      const deliveryCtx = document.getElementById('deliveryChart').getContext('2d');
+      deliveryChart = new Chart(deliveryCtx, {
+        type: 'bar',
+        data: {
+          labels: Object.keys(stats.deliveryDistribution),
+          datasets: [{
+            label: 'Scelte',
+            data: Object.values(stats.deliveryDistribution),
+            backgroundColor: '#4BC0C0'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+
+      // Checkout Time Chart
+      const checkoutTimeCtx = document.getElementById('checkoutTimeChart').getContext('2d');
+      checkoutTimeChart = new Chart(checkoutTimeCtx, {
+        type: 'bar',
+        data: {
+          labels: stats.checkoutTimeRanges.labels,
+          datasets: [{
+            label: 'Numero utenti',
+            data: stats.checkoutTimeRanges.data,
+            backgroundColor: '#9966FF'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+
+      // Checkout Variant Chart
+      const checkoutVariantCtx = document.getElementById('checkoutVariantChart').getContext('2d');
+      checkoutVariantChart = new Chart(checkoutVariantCtx, {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(stats.checkoutVariantDistribution),
+          datasets: [{
+            data: Object.values(stats.checkoutVariantDistribution),
+            backgroundColor: ['#FF9F40', '#FF6384', '#36A2EB', '#FFCE56']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
+      });
     }
 
     function populateTable(data) {
@@ -314,13 +433,18 @@
         const timeSpent = item.totalTimeSpent ? 
           Math.round(item.totalTimeSpent / 60000) + ' min' : 'N/A';
         
+        // Calcola tempo checkout
+        const checkoutTime = item.orderData?.checkoutTimeSpent ? 
+          Math.round(item.orderData.checkoutTimeSpent / 1000) + 's' : 'N/A';
+        
         row.innerHTML = `
           <td>${new Date(item.timestamp).toLocaleDateString('it-IT')} ${new Date(item.timestamp).toLocaleTimeString('it-IT')}</td>
           <td>${item.sessionId || 'N/A'}</td>
           <td>${item.initialSurvey?.age || 'N/A'}</td>
           <td>${item.initialSurvey?.gender || 'N/A'}</td>
-          <td>${item.initialSurvey?.education || 'N/A'}</td>
-          <td>${item.initialSurvey?.device || 'N/A'}</td>
+          <td>${item.orderData?.productTitle || 'N/A'}</td>
+          <td>${item.orderData?.deliveryValue === 'home' ? '🏠 Casa' : item.orderData?.deliveryValue === 'cc' ? '📦 C&C' : 'N/A'}</td>
+          <td>${checkoutTime}</td>
           <td>${timeSpent}</td>
           <td>
             <button onclick="viewDetails(${index})" style="background:#007bff;color:white;border:none;padding:0.25rem 0.5rem;border-radius:4px;cursor:pointer;">
@@ -354,8 +478,15 @@
 
 🛒 DATI ECOMMERCE:
 • Prodotto scelto: ${item.orderData?.productTitle || 'N/A'}
+• ID Prodotto: ${item.orderData?.productId || 'N/A'}
 • Metodo consegna: ${item.orderData?.deliveryMethod || 'N/A'}
+• Tempo nel checkout: ${item.orderData?.checkoutTimeSpent ? Math.round(item.orderData.checkoutTimeSpent / 1000) + ' secondi' : 'N/A'}
 • Variante checkout: ${item.checkoutData?.variant || 'N/A'}
+
+📱 INTERAZIONI PRODOTTI:
+${item.productInteractions ? Object.entries(item.productInteractions).map(([productId, data]) => 
+  `• Prodotto ${productId}: ${data.clickCount} click, primo click: ${new Date(data.firstClickAt).toLocaleString('it-IT')}`
+).join('\n') : '• Nessuna interazione tracciata'}
 
 📝 SURVEY FINALE:
 • Considerazione ambientale: ${item.finalSurvey?.environmental_consideration || 'N/A'}
@@ -389,8 +520,9 @@
     function convertToCSV(data) {
       const headers = [
         'Timestamp', 'SessionID', 'Age', 'Gender', 'Education', 'Device', 
-        'Financial', 'Frequency', 'Product', 'DeliveryMethod', 'CheckoutVariant',
-        'EnvironmentalConsideration', 'TotalTimeMinutes'
+        'Financial', 'Frequency', 'ProductTitle', 'ProductID', 'DeliveryMethod', 
+        'DeliveryValue', 'CheckoutTimeSeconds', 'CheckoutVariant',
+        'EnvironmentalConsideration', 'TotalTimeMinutes', 'ProductClicks'
       ];
       
       const rows = data.map(item => [
@@ -403,10 +535,14 @@
         item.initialSurvey?.financial || '',
         item.initialSurvey?.frequency || '',
         item.orderData?.productTitle || '',
+        item.orderData?.productId || '',
         item.orderData?.deliveryMethod || '',
+        item.orderData?.deliveryValue || '',
+        item.orderData?.checkoutTimeSpent ? Math.round(item.orderData.checkoutTimeSpent / 1000) : '',
         item.checkoutData?.variant || '',
         item.finalSurvey?.environmental_consideration || '',
-        item.totalTimeSpent ? Math.round(item.totalTimeSpent / 60000) : ''
+        item.totalTimeSpent ? Math.round(item.totalTimeSpent / 60000) : '',
+        item.productInteractions ? Object.values(item.productInteractions).reduce((sum, data) => sum + data.clickCount, 0) : ''
       ]);
 
       return [headers, ...rows].map(row => 

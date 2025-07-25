@@ -58,7 +58,11 @@ module.exports = async function handler(req, res) {
       genderDistribution: calculateGenderDistribution(surveyData),
       averageCompletionTime: calculateAverageTime(surveyData),
       educationDistribution: calculateEducationDistribution(surveyData),
-      deviceDistribution: calculateDeviceDistribution(surveyData)
+      deviceDistribution: calculateDeviceDistribution(surveyData),
+      productDistribution: calculateProductDistribution(surveyData),
+      deliveryDistribution: calculateDeliveryDistribution(surveyData),
+      checkoutTimeRanges: calculateCheckoutTimeRanges(surveyData),
+      checkoutVariantDistribution: calculateCheckoutVariantDistribution(surveyData)
     };
 
     console.log('Statistics calculated:', stats);
@@ -137,4 +141,78 @@ function calculateAverageTime(data) {
   const avgMinutes = Math.round(avgMs / 60000);
   
   return `${avgMinutes} minuti (media su ${times.length} risposte)`;
+}
+
+function calculateProductDistribution(data) {
+  const distribution = {};
+  data.forEach(function(response) {
+    if (response.orderData && response.orderData.productTitle) {
+      const product = response.orderData.productTitle;
+      distribution[product] = (distribution[product] || 0) + 1;
+    }
+  });
+  return distribution;
+}
+
+function calculateDeliveryDistribution(data) {
+  const distribution = {};
+  data.forEach(function(response) {
+    if (response.orderData && response.orderData.deliveryValue) {
+      const delivery = response.orderData.deliveryValue === 'home' ? 'Consegna a casa' : 'Click & Collect';
+      distribution[delivery] = (distribution[delivery] || 0) + 1;
+    }
+  });
+  return distribution;
+}
+
+function calculateCheckoutTimeRanges(data) {
+  const ranges = {
+    '0-30s': 0,
+    '31-60s': 0,
+    '1-2min': 0,
+    '2-5min': 0,
+    '5min+': 0
+  };
+  
+  data.forEach(function(response) {
+    if (response.orderData && response.orderData.checkoutTimeSpent) {
+      const timeSeconds = response.orderData.checkoutTimeSpent / 1000;
+      
+      if (timeSeconds <= 30) {
+        ranges['0-30s']++;
+      } else if (timeSeconds <= 60) {
+        ranges['31-60s']++;
+      } else if (timeSeconds <= 120) {
+        ranges['1-2min']++;
+      } else if (timeSeconds <= 300) {
+        ranges['2-5min']++;
+      } else {
+        ranges['5min+']++;
+      }
+    }
+  });
+  
+  return {
+    labels: Object.keys(ranges),
+    data: Object.values(ranges)
+  };
+}
+
+function calculateCheckoutVariantDistribution(data) {
+  const distribution = {};
+  const variantNames = {
+    1: 'Semplice',
+    2: 'Scelta Ecologica',
+    3: 'CO2 Risparmio',
+    4: 'Analisi CO2'
+  };
+  
+  data.forEach(function(response) {
+    if (response.checkoutData && response.checkoutData.variant) {
+      const variantName = variantNames[response.checkoutData.variant] || `Variante ${response.checkoutData.variant}`;
+      distribution[variantName] = (distribution[variantName] || 0) + 1;
+    }
+  });
+  
+  return distribution;
 } 

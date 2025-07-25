@@ -604,6 +604,8 @@
     let finalSurveyPage = 0;
     let finalSurveyAnswers = {};
     let allSurveyData = {}; // Store completo di tutti i dati
+    let checkoutStartTime = null; // Per tracciare tempo nel checkout
+    let productClickTimes = {}; // Per tracciare tempi di click sui prodotti
     let surveyStartTime = Date.now();
 
     // Prodotti
@@ -1059,7 +1061,8 @@
       allSurveyData.checkoutData = {
         product: product,
         variant: variant,
-        checkoutStartedAt: new Date().toISOString()
+        checkoutStartedAt: new Date().toISOString(),
+        productClickData: productClickTimes[product.id] || null
       };
 
       main.innerHTML = `
@@ -1175,6 +1178,10 @@
       
       const product = products.find(p => p.id === productId);
       const deliveryMethod = selectedDelivery.dataset.value === 'home' ? 'Consegna a domicilio' : 'Click & Collect';
+      const deliveryValue = selectedDelivery.dataset.value; // 'home' or 'cc'
+      
+      // Calculate checkout time
+      const checkoutTimeSpent = checkoutStartTime ? Date.now() - checkoutStartTime : null;
       
       const orderData = {
         firstName,
@@ -1182,12 +1189,16 @@
         shippingAddress: address,
         productTitle: product.title,
         productPrice: product.price,
+        productId: product.id,
         deliveryMethod,
+        deliveryValue,
+        checkoutTimeSpent,
         orderCompletedAt: new Date().toISOString()
       };
 
-      // Store order data
+      // Store order data with enhanced tracking
       allSurveyData.orderData = orderData;
+      allSurveyData.productInteractions = productClickTimes;
       
       renderSuccess(orderData);
     }
@@ -1357,6 +1368,16 @@
 
     // Global functions
     window.showProduct = function(id) {
+      // Track product click time
+      if (!productClickTimes[id]) {
+        productClickTimes[id] = {
+          firstClickAt: new Date().toISOString(),
+          clickCount: 1
+        };
+      } else {
+        productClickTimes[id].clickCount++;
+      }
+      
       const product = products.find(p => p.id === id);
       if (product) {
         renderProductDetail(product);
@@ -1366,6 +1387,10 @@
     window.goToCheckout = function(productId) {
       const product = products.find(p => p.id === productId);
       if (!product) return;
+      
+      // Track checkout start time
+      checkoutStartTime = Date.now();
+      
       const variant = Math.floor(Math.random() * 4) + 1;
       renderCheckout(product, variant);
     };
