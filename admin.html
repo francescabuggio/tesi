@@ -71,6 +71,15 @@
       margin-bottom: 1rem;
       color: #333;
     }
+    .chart-container {
+      position: relative;
+      height: 300px;
+      width: 100%;
+    }
+    .chart-container canvas {
+      max-height: 300px !important;
+      height: 300px !important;
+    }
     .data-table {
       background: white;
       border-radius: 12px;
@@ -162,11 +171,15 @@
       <div class="charts-grid">
         <div class="chart-card">
           <div class="chart-title">Distribuzione Età</div>
-          <canvas id="ageChart"></canvas>
+          <div class="chart-container">
+            <canvas id="ageChart"></canvas>
+          </div>
         </div>
         <div class="chart-card">
           <div class="chart-title">Distribuzione Genere</div>
-          <canvas id="genderChart"></canvas>
+          <div class="chart-container">
+            <canvas id="genderChart"></canvas>
+          </div>
         </div>
       </div>
 
@@ -200,6 +213,8 @@
 
   <script>
     let surveyData = [];
+    let ageChart = null;
+    let genderChart = null;
 
     async function loadData() {
       try {
@@ -232,9 +247,17 @@
     }
 
     function createCharts(stats) {
+      // Distruggi i grafici esistenti prima di crearne di nuovi
+      if (ageChart) {
+        ageChart.destroy();
+      }
+      if (genderChart) {
+        genderChart.destroy();
+      }
+
       // Age Chart
       const ageCtx = document.getElementById('ageChart').getContext('2d');
-      new Chart(ageCtx, {
+      ageChart = new Chart(ageCtx, {
         type: 'doughnut',
         data: {
           labels: Object.keys(stats.ageDistribution),
@@ -258,7 +281,7 @@
 
       // Gender Chart
       const genderCtx = document.getElementById('genderChart').getContext('2d');
-      new Chart(genderCtx, {
+      genderChart = new Chart(genderCtx, {
         type: 'bar',
         data: {
           labels: Object.keys(stats.genderDistribution),
