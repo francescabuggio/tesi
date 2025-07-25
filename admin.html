@@ -184,7 +184,9 @@
                 <th>Session ID</th>
                 <th>Età</th>
                 <th>Genere</th>
-                <th>Situazione Finanziaria</th>
+                <th>Educazione</th>
+                <th>Dispositivo</th>
+                <th>Tempo Totale</th>
                 <th>Azioni</th>
               </tr>
             </thead>
@@ -245,7 +247,12 @@
         },
         options: {
           responsive: true,
-          maintainAspectRatio: false
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          }
         }
       });
 
@@ -279,12 +286,19 @@
 
       data.forEach((item, index) => {
         const row = tbody.insertRow();
+        
+        // Calcola tempo totale in formato leggibile
+        const timeSpent = item.totalTimeSpent ? 
+          Math.round(item.totalTimeSpent / 60000) + ' min' : 'N/A';
+        
         row.innerHTML = `
-          <td>${new Date(item.timestamp).toLocaleDateString('it-IT')}</td>
-          <td>${item.sessionId}</td>
+          <td>${new Date(item.timestamp).toLocaleDateString('it-IT')} ${new Date(item.timestamp).toLocaleTimeString('it-IT')}</td>
+          <td>${item.sessionId || 'N/A'}</td>
           <td>${item.initialSurvey?.age || 'N/A'}</td>
           <td>${item.initialSurvey?.gender || 'N/A'}</td>
-          <td>${item.initialSurvey?.financial || 'N/A'}</td>
+          <td>${item.initialSurvey?.education || 'N/A'}</td>
+          <td>${item.initialSurvey?.device || 'N/A'}</td>
+          <td>${timeSpent}</td>
           <td>
             <button onclick="viewDetails(${index})" style="background:#007bff;color:white;border:none;padding:0.25rem 0.5rem;border-radius:4px;cursor:pointer;">
               Dettagli
@@ -296,7 +310,39 @@
 
     function viewDetails(index) {
       const item = surveyData[index];
-      alert(JSON.stringify(item, null, 2));
+      
+      // Crea una finestra popup con i dettagli formattati
+      const details = `
+═══════════════════════════
+📊 DETTAGLI RISPOSTA
+═══════════════════════════
+
+🆔 Session ID: ${item.sessionId || 'N/A'}
+📅 Data: ${new Date(item.timestamp).toLocaleString('it-IT')}
+⏱️ Tempo totale: ${item.totalTimeSpent ? Math.round(item.totalTimeSpent / 60000) + ' minuti' : 'N/A'}
+
+📋 SURVEY INIZIALE:
+• Età: ${item.initialSurvey?.age || 'N/A'}
+• Genere: ${item.initialSurvey?.gender || 'N/A'}
+• Educazione: ${item.initialSurvey?.education || 'N/A'}
+• Dispositivo: ${item.initialSurvey?.device || 'N/A'}
+• Situazione finanziaria: ${item.initialSurvey?.financial || 'N/A'}
+• Frequenza acquisti: ${item.initialSurvey?.frequency || 'N/A'}
+
+🛒 DATI ECOMMERCE:
+• Prodotto scelto: ${item.orderData?.productTitle || 'N/A'}
+• Metodo consegna: ${item.orderData?.deliveryMethod || 'N/A'}
+• Variante checkout: ${item.checkoutData?.variant || 'N/A'}
+
+📝 SURVEY FINALE:
+• Considerazione ambientale: ${item.finalSurvey?.environmental_consideration || 'N/A'}
+• Difficoltà overview: ${item.finalSurvey?.difficult_overview || 'N/A'}
+• Descrizioni utili: ${item.finalSurvey?.useful_descriptions || 'N/A'}
+
+═══════════════════════════
+      `;
+      
+      alert(details);
     }
 
     function exportData() {
@@ -306,28 +352,42 @@
       }
 
       const csv = convertToCSV(surveyData);
-      const blob = new Blob([csv], { type: 'text/csv' });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = `survey-data-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
       a.click();
+      document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
     }
 
     function convertToCSV(data) {
-      const headers = ['Timestamp', 'SessionID', 'Age', 'Gender', 'Education', 'Financial'];
+      const headers = [
+        'Timestamp', 'SessionID', 'Age', 'Gender', 'Education', 'Device', 
+        'Financial', 'Frequency', 'Product', 'DeliveryMethod', 'CheckoutVariant',
+        'EnvironmentalConsideration', 'TotalTimeMinutes'
+      ];
+      
       const rows = data.map(item => [
-        item.timestamp,
-        item.sessionId,
+        item.timestamp || '',
+        item.sessionId || '',
         item.initialSurvey?.age || '',
         item.initialSurvey?.gender || '',
         item.initialSurvey?.education || '',
-        item.initialSurvey?.financial || ''
+        item.initialSurvey?.device || '',
+        item.initialSurvey?.financial || '',
+        item.initialSurvey?.frequency || '',
+        item.orderData?.productTitle || '',
+        item.orderData?.deliveryMethod || '',
+        item.checkoutData?.variant || '',
+        item.finalSurvey?.environmental_consideration || '',
+        item.totalTimeSpent ? Math.round(item.totalTimeSpent / 60000) : ''
       ]);
 
       return [headers, ...rows].map(row => 
-        row.map(field => `"${field}"`).join(',')
+        row.map(field => `"${String(field).replace(/"/g, '""')}"`).join(',')
       ).join('\n');
     }
 

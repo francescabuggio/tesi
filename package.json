@@ -8,9 +8,11 @@
     "build": "echo 'No build step required'",
     "start": "echo 'Static site - no start command needed'"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.7"
+  },
   "devDependencies": {},
   "keywords": ["survey", "ecommerce", "research", "vu-amsterdam"],
   "author": "Francesca Buggio",
   "license": "MIT"
-} 
+}

@@ -1,7 +1,11 @@
-const fs = require('fs');
-const path = require('path');
+const { createClient } = require('@supabase/supabase-js');
 
-module.exports = function handler(req, res) {
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
+
+module.exports = async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -20,48 +24,36 @@ module.exports = function handler(req, res) {
   try {
     console.log('Received survey data:', JSON.stringify(req.body, null, 2));
 
+    // Genera un session ID unico
+    const sessionId = generateSessionId();
+    
+    // Prepara i dati da salvare
     const surveyData = {
       timestamp: new Date().toISOString(),
-      sessionId: generateSessionId(),
+      sessionId: sessionId,
       ...req.body
     };
 
-    // Path per il file JSON
-    const dataDir = path.join(process.cwd(), 'data');
-    const filePath = path.join(dataDir, 'surveys.json');
+    console.log('Saving to Supabase:', sessionId);
 
-    console.log('Data directory:', dataDir);
-    console.log('File path:', filePath);
+    // Salva su Supabase
+    const { data, error } = await supabase
+      .from('responses')
+      .insert([{ data: surveyData }])
+      .select();
 
-    // Crea directory se non esiste
-    if (!fs.existsSync(dataDir)) {
-      console.log('Creating data directory...');
-      fs.mkdirSync(dataDir, { recursive: true });
+    if (error) {
+      console.error('Supabase error:', error);
+      throw error;
     }
 
-    // Leggi dati esistenti o crea array vuoto
-    let existingData = [];
-    if (fs.existsSync(filePath)) {
-      console.log('Reading existing data...');
-      const fileContent = fs.readFileSync(filePath, 'utf-8');
-      existingData = fileContent ? JSON.parse(fileContent) : [];
-    } else {
-      console.log('No existing data file found, creating new...');
-    }
-
-    // Aggiungi nuovi dati
-    existingData.push(surveyData);
-    console.log('Total entries after adding:', existingData.length);
-
-    // Salva file aggiornato
-    fs.writeFileSync(filePath, JSON.stringify(existingData, null, 2));
-    console.log('Data saved successfully');
+    console.log('Data saved successfully to Supabase:', data);
 
     res.status(200).json({ 
       success: true, 
-      message: 'Dati salvati con successo',
-      sessionId: surveyData.sessionId,
-      totalEntries: existingData.length
+      message: 'Dati salvati con successo su Supabase!',
+      sessionId: sessionId,
+      supabaseId: data[0]?.id
     });
 
   } catch (error) {
@@ -69,7 +61,7 @@ module.exports = function handler(req, res) {
     res.status(500).json({ 
       success: false, 
       error: error.message,
-      details: 'Errore interno del server'
+      details: 'Errore nel salvare su Supabase'
     });
   }
 }
