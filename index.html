@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Francesca Shop</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    
+    /* Survey Styles */
+    .survey-container {
+      max-width: 700px;
+      margin: 2rem auto;
+      background: rgba(255,255,255,0.95);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      padding: 2.5rem;
+      backdrop-filter: blur(10px);
+    }
+    .survey-header {
+      background: #1e88e5;
+      color: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    .survey-header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 400;
+    }
+    .question-group {
+      margin-bottom: 2.5rem;
+      padding: 1.5rem;
+      background: #f8f9fa;
+      border-radius: 12px;
+      border-left: 4px solid #1e88e5;
+    }
+    .question-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 1.5rem;
+      line-height: 1.4;
+    }
+    .radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+    .radio-option {
+      display: flex;
+      align-items: center;
+      padding: 0.8rem 1rem;
+      background: #fff;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .radio-option:hover {
+      border-color: #1e88e5;
+      background: #f0f7ff;
+    }
+    .radio-option.selected {
+      border-color: #1e88e5;
+      background: #e3f2fd;
+    }
+    .radio-option input[type="radio"] {
+      margin-right: 0.8rem;
+      cursor: pointer;
+    }
+    .radio-option label {
+      cursor: pointer;
+      font-size: 0.95rem;
+      color: #333;
+    }
+    .likert-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .likert-table th {
+      background: #f8f9fa;
+      padding: 0.8rem 0.5rem;
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #555;
+      border-bottom: 1px solid #dee2e6;
+    }
+    .likert-table td {
+      padding: 1rem 0.5rem;
+      text-align: center;
+      border-bottom: 1px solid #f1f3f4;
+    }
+    .likert-table td:first-child {
+      text-align: left;
+      font-size: 0.9rem;
+      color: #333;
+      padding-left: 1rem;
+      max-width: 200px;
+    }
+    .likert-table input[type="radio"] {
+      cursor: pointer;
+      transform: scale(1.2);
+    }
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: #e9ecef;
+      border-radius: 3px;
+      margin: 2rem 0;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #1e88e5;
+      transition: width 0.3s ease;
+      border-radius: 3px;
+    }
+    .survey-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+    }
+    .btn-survey {
+      padding: 0.8rem 2rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .btn-prev {
+      background: #6c757d;
+      color: white;
+    }
+    .btn-prev:hover {
+      background: #5a6268;
+    }
+    .btn-next {
+      background: #1e88e5;
+      color: white;
+    }
+    .btn-next:hover {
+      background: #1565c0;
+    }
+    .btn-submit {
+      background: #28a745;
+      color: white;
+    }
+    .btn-submit:hover {
+      background: #218838;
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    /* Scenario Page Styles */
+    .scenario-container {
+      max-width: 600px;
+      margin: 3rem auto;
+      background: rgba(255,255,255,0.95);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      padding: 3rem;
+      backdrop-filter: blur(10px);
+      text-align: center;
+    }
+    .scenario-title {
+      font-size: 2rem;
+      font-weight: 600;
+      color: #1e88e5;
+      margin-bottom: 2rem;
+      letter-spacing: 1px;
+    }
+    .scenario-content {
+      background: linear-gradient(145deg, #f8f9fa, #e3f2fd);
+      border-radius: 16px;
+      padding: 2.5rem;
+      margin: 2rem 0;
+      border-left: 5px solid #1e88e5;
+      position: relative;
+      overflow: hidden;
+    }
+    .scenario-content::before {
+      content: "📧";
+      position: absolute;
+      top: 1rem;
+      right: 1.5rem;
+      font-size: 2rem;
+      opacity: 0.3;
+    }
+    .scenario-text {
+      font-size: 1.1rem;
+      line-height: 1.7;
+      color: #333;
+      font-style: italic;
+      text-align: left;
+      margin: 0;
+    }
+    .scenario-highlight {
+      background: rgba(30, 136, 229, 0.1);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-weight: 600;
+      color: #1565c0;
+    }
+    .shop-name {
+      font-weight: 700;
+      color: #1e88e5;
+      font-size: 1.2em;
+    }
+    .scenario-button {
+      background: linear-gradient(135deg, #1e88e5, #1565c0);
+      color: white;
+      padding: 1rem 2.5rem;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 16px rgba(30, 136, 229, 0.3);
+      margin-top: 2rem;
+    }
+    .scenario-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(30, 136, 229, 0.4);
+    }
+    
+    /* Ecommerce Styles (existing) */
+    header {
+      background: rgba(0,0,0,0.8);
+      color: #fff;
+      padding: 1.5rem 2rem;
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.2rem;
+      font-weight: 300;
+      letter-spacing: 2px;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 2rem auto;
+      background: rgba(255,255,255,0.95);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      padding: 2.5rem;
+      backdrop-filter: blur(10px);
+    }
+    .page-title {
+      text-align: center;
+      color: #333;
+      margin-bottom: 2rem;
+      font-size: 1.8rem;
+      font-weight: 400;
+    }
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      justify-items: center;
+    }
+    .product-card {
+      background: linear-gradient(145deg, #ffffff, #f0f0f0);
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 280px;
+      padding: 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .product-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+    }
+    .product-emoji {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .product-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.8rem;
+      color: #333;
+      line-height: 1.4;
+    }
+    .product-price {
+      color: #27ae60;
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    .btn {
+      display: inline-block;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      margin: 0.5rem;
+    }
+    .btn-secondary {
+      background: #f8f9fa;
+      color: #333;
+      border: 1px solid #dee2e6;
+    }
+    .btn-secondary:hover {
+      background: #e9ecef;
+      transform: translateY(-1px);
+    }
+    .btn-primary {
+      background: #27ae60;
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: #219a52;
+      transform: translateY(-1px);
+    }
+    .product-detail {
+      text-align: center;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .product-detail-emoji {
+      font-size: 8rem;
+      margin-bottom: 1.5rem;
+      display: block;
+    }
+    .product-detail-title {
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #333;
+    }
+    .product-detail-price {
+      color: #27ae60;
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+    }
+    .product-detail-desc {
+      font-size: 1.1rem;
+      color: #666;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+    .checkout-container {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      padding: 2rem;
+      max-width: 450px;
+      margin: 2rem auto;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    .checkout-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #eee;
+    }
+    .checkout-emoji {
+      font-size: 3.5rem;
+    }
+    .checkout-info h3 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.2rem;
+      color: #333;
+    }
+    .checkout-info .price {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #27ae60;
+      margin: 0;
+    }
+    .delivery-section h4 {
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+    }
+    .delivery-option {
+      border: 2px solid #e9ecef;
+      border-radius: 12px;
+      padding: 1.2rem;
+      margin-bottom: 1rem;
+      background: #fafbfc;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    .delivery-option:hover {
+      border-color: #27ae60;
+      background: #f8fff9;
+    }
+    .delivery-option.selected {
+      border-color: #27ae60;
+      background: #f0f9f0;
+      box-shadow: 0 2px 8px rgba(39, 174, 96, 0.1);
+    }
+    .delivery-option.selected::before {
+      content: "✓";
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      color: #27ae60;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+    .delivery-title {
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .delivery-subtitle {
+      color: #666;
+      font-size: 0.95rem;
+      margin-bottom: 0.5rem;
+    }
+    .eco-badge {
+      color: #27ae60;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+    .co2-details {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: #f8f9fa;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .co2-details h5 {
+      margin: 0 0 0.8rem 0;
+      color: #333;
+      font-size: 1rem;
+    }
+    .eco-icon {
+      color: #27ae60;
+      font-size: 1.2rem;
+    }
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #333;
+      font-size: 0.95rem;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+      background: #fff;
+    }
+    .form-group input:focus {
+      outline: none;
+      border-color: #27ae60;
+      box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+    }
+    .form-group input.error {
+      border-color: #e74c3c;
+    }
+    .error-message {
+      color: #e74c3c;
+      font-size: 0.85rem;
+      margin-top: 0.3rem;
+      display: none;
+    }
+    .shipping-form {
+      margin: 1.5rem 0;
+      padding: 1.5rem;
+      background: #f8f9fa;
+      border-radius: 12px;
+      border: 1px solid #e9ecef;
+    }
+    .shipping-form h4 {
+      margin: 0 0 1.5rem 0;
+      color: #333;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    .success-container {
+      text-align: center;
+      max-width: 500px;
+      margin: 3rem auto;
+      padding: 3rem 2rem;
+      background: linear-gradient(145deg, #ffffff, #f0f9f0);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(39, 174, 96, 0.1);
+      border: 2px solid rgba(39, 174, 96, 0.1);
+    }
+    .success-icon {
+      font-size: 4rem;
+      margin-bottom: 1.5rem;
+      color: #27ae60;
+    }
+    .success-title {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: #27ae60;
+      margin-bottom: 1rem;
+    }
+    .success-message {
+      color: #666;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+    .order-summary {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin: 2rem 0;
+      border: 1px solid #e9ecef;
+      text-align: left;
+    }
+    .order-summary h5 {
+      margin: 0 0 1rem 0;
+      color: #333;
+      font-size: 1.1rem;
+    }
+    .order-summary p {
+      margin: 0.5rem 0;
+      color: #666;
+      font-size: 0.95rem;
+    }
+    @media (max-width: 768px) {
+      .container, .survey-container {
+        margin: 1rem;
+        padding: 1.5rem;
+      }
+      .products {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+      }
+      .product-detail-emoji {
+        font-size: 6rem;
+      }
+      .checkout-container {
+        margin: 1rem;
+        padding: 1.5rem;
+      }
+      .likert-table {
+        font-size: 0.8rem;
+      }
+      .likert-table th, .likert-table td {
+        padding: 0.5rem 0.3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app-content">
+    <!-- Survey will be injected here initially -->
+  </div>
+
+  <script>
+    // Survey data
+    const surveyQuestions = [
+      {
+        id: 'age',
+        title: 'Qual è la tua fascia d\'età?',
+        type: 'radio',
+        options: [
+          { value: 'under18', label: '<18' },
+          { value: '18-24', label: '18-24' },
+          { value: '25-34', label: '25-34' },
+          { value: '35-44', label: '35-44' },
+          { value: '45-54', label: '45-54' },
+          { value: '55-64', label: '55-64' }
+        ]
+      },
+      {
+        id: 'gender',
+        title: 'Di che genere sei?',
+        type: 'radio',
+        options: [
+          { value: 'male', label: 'Maschile' },
+          { value: 'female', label: 'Femminile' },
+          { value: 'other', label: 'Altro' }
+        ]
+      },
+      {
+        id: 'education',
+        title: 'Qual è il tuo livello di istruzione più elevato?',
+        type: 'radio',
+        options: [
+          { value: 'elementary', label: 'Elementari' },
+          { value: 'middle', label: 'Medie' },
+          { value: 'diploma', label: 'Diploma' },
+          { value: 'bachelor', label: 'Laurea di I livello' },
+          { value: 'master', label: 'Laurea di II livello' },
+          { value: 'other', label: 'Oltre' }
+        ]
+      },
+      {
+        id: 'device',
+        title: 'Con quale dispositivo effettui più frequentemente acquisti online?',
+        type: 'radio',
+        options: [
+          { value: 'smartphone', label: 'Smartphone' },
+          { value: 'computer', label: 'Computer (desktop/laptop)' },
+          { value: 'tablet', label: 'Tablet' }
+        ]
+      },
+      {
+        id: 'financial',
+        title: 'Come descriveresti la tua situazione finanziaria? Con il mio reddito...',
+        type: 'radio',
+        options: [
+          { value: 'struggle', label: 'Faccio fatica ad arrivare a fine mese' },
+          { value: 'cover', label: 'Riesco solo a coprire le spese' },
+          { value: 'save', label: 'Guadagno abbastanza da risparmiare o permettermi qualche extra' },
+          { value: 'buy', label: 'Guadagno abbastanza da poter comprare (quasi) tutto ciò che voglio' }
+        ]
+      },
+      {
+        id: 'frequency',
+        title: 'Quanto spesso effettui acquisti online?',
+        type: 'radio',
+        options: [
+          { value: 'never', label: 'Mai' },
+          { value: 'yearly', label: 'Una volta all\'anno' },
+          { value: 'monthly', label: 'Una volta al mese' },
+          { value: 'few-monthly', label: 'Qualche volta al mese' },
+          { value: 'weekly', label: 'Una volta a settimana' }
+        ]
+      }
+    ];
+
+    const likertQuestions = [
+      {
+        id: 'stress_financial',
+        text: 'Quanto senti di essere stressato/a dalla tua situazione finanziaria attuale?'
+      },
+      {
+        id: 'download_files',
+        text: 'So come aprire i file che ho scaricato'
+      },
+      {
+        id: 'open_tabs',
+        text: 'So come aprire una nuova scheda nel mio Browser'
+      },
+      {
+        id: 'find_website',
+        text: 'Ho difficoltà a ritrovare un sito web che ho visitato in precedenza'
+      },
+      {
+        id: 'get_tired',
+        text: 'Mi stanco facilmente quando cerco informazioni online'
+      },
+      {
+        id: 'end_up_sites',
+        text: 'Mi capita di finire su siti web senza sapere come ci sono arrivato/a'
+      },
+      {
+        id: 'confusing_structure',
+        text: 'Trovo confusa la struttura della maggior parte dei siti web'
+      },
+      {
+        id: 'easy_shopping',
+        text: 'È facile fare acquisti online'
+      },
+      {
+        id: 'buy_unavailable',
+        text: 'Online posso acquistare prodotti che non sono disponibili nei negozi fisici'
+      },
+      {
+        id: 'save_time',
+        text: 'Fare acquisti online fa risparmiare tempo'
+      },
+      {
+        id: 'easy_compare',
+        text: 'È più facile confrontare i prodotti online'
+      },
+      {
+        id: 'avoid_hassle',
+        text: 'Fare acquisti online evita il fastidio di andare in negozio'
+      },
+      {
+        id: 'enjoy_shopping',
+        text: 'Mi piace fare acquisti online perché posso farlo in qualsiasi momento della giornata o della notte'
+      }
+    ];
+
+    const likertScale = [
+      'Totalmente in disaccordo',
+      'Molto in disaccordo', 
+      'Abbastanza in disaccordo',
+      'Né d\'accordo né in disaccordo',
+      'Abbastanza d\'accordo',
+      'Molto d\'accordo',
+      'Totalmente d\'accordo'
+    ];
+
+    // Survey state
+    let currentPage = 0;
+    let surveyAnswers = {};
+    let isInSurvey = true;
+    let isInFinalSurvey = false;
+    let finalSurveyPage = 0;
+    let finalSurveyAnswers = {};
+
+    // Products data (existing)
+    const products = [
+      {
+        id: 1,
+        title: "Maglietta FC Barcelona 2023/24",
+        price: "€29,90",
+        description: "Maglia ufficiale Home stagione 2023/24. Tessuto tecnico, colori vivaci."
+      },
+      {
+        id: 2,
+        title: "Maglietta Juventus 2023/24",
+        price: "€29,90",
+        description: "Maglia ufficiale Home stagione 2023/24. Tessuto tecnico, colori vivaci."
+      },
+      {
+        id: 3,
+        title: "Maglietta Manchester United 2023/24",
+        price: "€29,90",
+        description: "Maglia ufficiale Home stagione 2023/24. Tessuto tecnico, colori vivaci."
+      },
+      {
+        id: 4,
+        title: "Maglietta Paris Saint-Germain 2023/24",
+        price: "€29,90",
+        description: "Maglia ufficiale Home stagione 2023/24. Tessuto tecnico, colori vivaci."
+      }
+    ];
+
+    // Final survey questions
+    const finalSurveyQuestions = [
+      {
+        id: 'environmental_consideration',
+        title: 'Indica con quale frequenza ti riconosci nella seguente affermazione:',
+        subtitle: 'Tengo in considerazione il potenziale impatto ambientale delle mie azioni quando prendo la maggior parte delle mie decisioni',
+        type: 'radio',
+        options: [
+          { value: 'never', label: 'Mai' },
+          { value: 'rarely', label: 'Raramente' },
+          { value: 'sometimes', label: 'A volte' },
+          { value: 'often', label: 'Spesso' },
+          { value: 'always', label: 'Sempre' }
+        ]
+      }
+    ];
+
+    const finalLikertQuestions = [
+      {
+        id: 'feel_irresponsible',
+        text: 'Mi sentirei irresponsabile se non scegliessi l\'opzione di consegna più sostenibile'
+      },
+      {
+        id: 'feel_guilty',
+        text: 'Mi sentirei in colpa se non scegliessi l\'opzione di consegna più sostenibile'
+      },
+      {
+        id: 'feel_responsible',
+        text: 'Mi sentirei responsabile se non contribuissi a proteggere l\'ambiente'
+      },
+      {
+        id: 'difficult_overview',
+        text: 'È stato difficile avere una visione d\'insieme delle opzioni di consegna'
+      },
+      {
+        id: 'difficult_design',
+        text: 'Il design della pagina ha reso difficile trovare rapidamente le informazioni rilevanti'
+      },
+      {
+        id: 'effort_understand',
+        text: 'Ho dovuto fare uno sforzo per comprendere le opzioni di consegna prima di scegliere'
+      },
+      {
+        id: 'difficult_options',
+        text: 'Le opzioni di consegna erano difficili da comprendere durante la fase di checkout'
+      },
+      {
+        id: 'useful_descriptions',
+        text: 'Le descrizioni relative alle opzioni di consegna sono state utili per la mia scelta'
+      }
+    ];
+
+    const finalLikertScale = [
+      'Totalmente in disaccordo',
+      'Molto in disaccordo',
+      'Abbastanza in disaccordo',
+      'Né d\'accordo né in disaccordo',
+      'Abbastanza d\'accordo',
+      'Molto d\'accordo',
+      'Totalmente d\'accordo'
+    ];
+
+    // Survey functions
+    function renderSurvey() {
+      const app = document.getElementById('app-content');
+      const totalPages = surveyQuestions.length + 1; // +1 for likert page
+      const progressPercent = (currentPage / totalPages) * 100;
+      
+      if (currentPage < surveyQuestions.length) {
+        // Regular questions
+        const question = surveyQuestions[currentPage];
+        app.innerHTML = `
+          <div class="survey-container">
+            <div class="survey-header">
+              <h1>VU VRIJE UNIVERSITEIT AMSTERDAM</h1>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${progressPercent}%"></div>
+            </div>
+            <div class="question-group">
+              <div class="question-title">${question.title}</div>
+              <div class="radio-group">
+                ${question.options.map(option => `
+                  <div class="radio-option ${surveyAnswers[question.id] === option.value ? 'selected' : ''}" 
+                       onclick="selectAnswer('${question.id}', '${option.value}')">
+                    <input type="radio" id="${question.id}_${option.value}" name="${question.id}" 
+                           value="${option.value}" ${surveyAnswers[question.id] === option.value ? 'checked' : ''}>
+                    <label for="${question.id}_${option.value}">${option.label}</label>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+            <div class="survey-buttons">
+              <button class="btn-survey btn-prev" onclick="prevPage()" ${currentPage === 0 ? 'disabled' : ''}>
+                Indietro
+              </button>
+              <button class="btn-survey btn-next" onclick="nextPage()" 
+                      ${!surveyAnswers[question.id] ? 'disabled' : ''}>
+                Avanti
+              </button>
+            </div>
+          </div>
+        `;
+      } else if (currentPage === surveyQuestions.length) {
+        // Likert scale page
+        app.innerHTML = `
+          <div class="survey-container">
+            <div class="survey-header">
+              <h1>VU VRIJE UNIVERSITEIT AMSTERDAM</h1>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${progressPercent}%"></div>
+            </div>
+            <div class="question-group">
+              <div class="question-title">Indica quanto sei d'accordo con ciascuna delle seguenti affermazioni:</div>
+              <table class="likert-table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    ${likertScale.map((scale, i) => `<th>${scale}</th>`).join('')}
+                  </tr>
+                </thead>
+                <tbody>
+                  ${likertQuestions.map(q => `
+                    <tr>
+                      <td>${q.text}</td>
+                      ${likertScale.map((scale, i) => `
+                        <td>
+                          <input type="radio" name="${q.id}" value="${i}" 
+                                 onchange="selectLikert('${q.id}', ${i})"
+                                 ${surveyAnswers[q.id] == i ? 'checked' : ''}>
+                        </td>
+                      `).join('')}
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+            <div class="survey-buttons">
+              <button class="btn-survey btn-prev" onclick="prevPage()">Indietro</button>
+              <button class="btn-survey btn-submit" onclick="completeSurvey()" 
+                      ${!allLikertAnswered() ? 'disabled' : ''}>
+                Completa questionario
+              </button>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function selectAnswer(questionId, value) {
+      surveyAnswers[questionId] = value;
+      renderSurvey();
+    }
+
+    function selectLikert(questionId, value) {
+      surveyAnswers[questionId] = value;
+      // Check if all likert questions are answered
+      const submitBtn = document.querySelector('.btn-submit');
+      if (allLikertAnswered()) {
+        submitBtn.disabled = false;
+      }
+    }
+
+    function allLikertAnswered() {
+      return likertQuestions.every(q => surveyAnswers[q.id] !== undefined);
+    }
+
+    function nextPage() {
+      if (currentPage < surveyQuestions.length) {
+        currentPage++;
+        renderSurvey();
+      }
+    }
+
+    function prevPage() {
+      if (currentPage > 0) {
+        currentPage--;
+        renderSurvey();
+      }
+    }
+
+    function completeSurvey() {
+      console.log('Survey completed:', surveyAnswers);
+      isInSurvey = false;
+      showScenario();
+    }
+
+    function showScenario() {
+      const app = document.getElementById('app-content');
+      app.innerHTML = `
+        <div class="scenario-container">
+          <h2 class="scenario-title">Descrizione Scenario</h2>
+          <div class="scenario-content">
+            <p class="scenario-text">
+              «È <span class="scenario-highlight">martedì pomeriggio</span>. Hai ricevuto via e-mail un 
+              <span class="scenario-highlight">buono regalo da 30 €</span> da usare sullo shop 
+              <span class="shop-name">SportPlanet</span> entro <span class="scenario-highlight">48 ore</span>. 
+              Tuo nipote compie <span class="scenario-highlight">9 anni venerdì sera</span>, quando vi 
+              ritroverete tutti a cena per la festa. Vorresti fargli un piccolo regalo sportivo 
+              approfittando del buono.»
+            </p>
+          </div>
+          <button class="scenario-button" onclick="startEcommerce()">
+            Vai al negozio SportPlanet 🏪
+          </button>
+        </div>
+      `;
+    }
+
+    function startEcommerce() {
+      const app = document.getElementById('app-content');
+      app.innerHTML = `
+        <header>
+          <h1>SportPlanet</h1>
+        </header>
+        <div class="container" id="main-content">
+          <!-- Content will be injected here -->
+        </div>
+      `;
+      renderHome();
+    }
+
+    // Ecommerce functions (existing)
+    function renderHome() {
+      const main = document.getElementById('main-content');
+      main.innerHTML = `
+        <h2 class="page-title">Prodotti in evidenza</h2>
+        <div class="products">
+          ${products.map(p => `
+            <div class="product-card" onclick="showProduct(${p.id})">
+              <span class="product-emoji">👕</span>
+              <div class="product-title">${p.title}</div>
+              <div class="product-price">${p.price}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderProductDetail(product) {
+      const main = document.getElementById('main-content');
+      main.innerHTML = `
+        <div class="product-detail">
+          <button class="btn btn-secondary" onclick="renderHome()">← Torna ai prodotti</button>
+          <span class="product-detail-emoji">👕</span>
+          <h2 class="product-detail-title">${product.title}</h2>
+          <div class="product-detail-price">${product.price}</div>
+          <p class="product-detail-desc">${product.description}</p>
+          <button class="btn btn-primary" onclick="goToCheckout(${product.id})">Vai al checkout</button>
+        </div>
+      `;
+    }
+
+    function renderCheckout(product, variant) {
+      const main = document.getElementById('main-content');
+      
+      let extraContent = '';
+      if (variant === 2) {
+        extraContent = '<div class="eco-badge">Scelta ecologica</div>';
+      } else if (variant === 3) {
+        extraContent = '<div class="eco-badge">-15% emissioni CO₂: urbane · -5% rurali vs Consegna a domicilio</div>';
+      } else if (variant === 4) {
+        extraContent = `
+          <div class="co2-details">
+            <h5>Calcolo emissioni CO₂e (kg per collo)</h5>
+            <div>
+              <strong>Scenario urbano</strong><br>
+              Tratta hub → pickup point: 4,1 km · 0,158 kg/km = 0,65 kg<br>
+              <strong>C&C:</strong> 0,65 kg ÷ 2 pacchi = <strong>0,33 kg</strong><br>
+              <strong>Delivery:</strong> furgone casa-per-casa (4,1 km) = <strong>0,41 kg</strong><br><br>
+              
+              <strong>Scenario rurale</strong><br>
+              Tratta hub → borgo: 16 km · 0,158 kg/km = 2,53 kg<br>
+              <strong>C&C:</strong> 2,53 kg ÷ 6 pacchi = <strong>0,42 kg</strong><br>
+              <strong>Delivery:</strong> percorso singolo casa (16 km) = <strong>0,50 kg</strong><br><br>
+              
+              Fattore emissione: 0,158 kg·km⁻¹ (furgone diesel Euro 6)
+            </div>
+          </div>
+        `;
+      }
+
+      main.innerHTML = `
+        <button class="btn btn-secondary" onclick="showProduct(${product.id})">← Indietro</button>
+        <div class="checkout-container">
+          <div class="checkout-header">
+            <span class="checkout-emoji">👕</span>
+            <div class="checkout-info">
+              <h3>${product.title}</h3>
+              <p class="price">${product.price}</p>
+            </div>
+          </div>
+          
+          <div class="delivery-section">
+            <h4>Metodo di consegna</h4>
+            <div class="delivery-option selected" data-value="home">
+              <div class="delivery-title">Consegna a domicilio</div>
+              <div class="delivery-subtitle">1–2 giorni – Standard</div>
+            </div>
+            <div class="delivery-option" data-value="cc">
+              <div class="delivery-title">
+                <span class="eco-icon">◆</span> Click & Collect
+              </div>
+              <div class="delivery-subtitle">2–3 giorni – Ritira al punto di raccolta</div>
+              ${extraContent}
+            </div>
+          </div>
+          
+          <div class="shipping-form">
+            <h4>Dati di spedizione</h4>
+            <div class="form-group">
+              <label for="firstName">Nome *</label>
+              <input type="text" id="firstName" placeholder="Inserisci il tuo nome">
+              <div class="error-message"></div>
+            </div>
+            <div class="form-group">
+              <label for="lastName">Cognome *</label>
+              <input type="text" id="lastName" placeholder="Inserisci il tuo cognome">
+              <div class="error-message"></div>
+            </div>
+            <div class="form-group">
+              <label for="address">Indirizzo di spedizione *</label>
+              <input type="text" id="address" placeholder="Via, numero civico, città">
+              <div class="error-message"></div>
+            </div>
+          </div>
+          
+          <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="completeOrder(${product.id})">Conferma ordine</button>
+        </div>
+      `;
+
+      setTimeout(() => {
+        const options = document.querySelectorAll('.delivery-option');
+        options.forEach(option => {
+          option.addEventListener('click', function() {
+            options.forEach(opt => opt.classList.remove('selected'));
+            this.classList.add('selected');
+          });
+        });
+      }, 100);
+    }
+
+    function renderSuccess(orderData) {
+      const main = document.getElementById('main-content');
+      main.innerHTML = `
+        <div class="success-container">
+          <div class="success-icon">🎉</div>
+          <h2 class="success-title">Ordine Completato!</h2>
+          <p class="success-message">
+            Ciao ${orderData.firstName}! Il tuo ordine è stato ricevuto con successo.<br>
+            Riceverai una email di conferma a breve.
+          </p>
+          
+          <div class="order-summary">
+            <h5>Riepilogo Ordine</h5>
+            <p><strong>Prodotto:</strong> ${orderData.productTitle}</p>
+            <p><strong>Prezzo:</strong> ${orderData.productPrice}</p>
+            <p><strong>Spedizione:</strong> ${orderData.shippingAddress}</p>
+            <p><strong>Modalità:</strong> ${orderData.deliveryMethod}</p>
+            <p><strong>Numero ordine:</strong> #${Math.floor(Math.random() * 100000)}</p>
+          </div>
+          
+          <button class="btn btn-primary" onclick="startFinalSurvey()">Continua</button>
+        </div>
+      `;
+    }
+
+    function completeOrder(productId) {
+      const firstName = document.getElementById('firstName').value.trim();
+      const lastName = document.getElementById('lastName').value.trim();
+      const address = document.getElementById('address').value.trim();
+      const selectedDelivery = document.querySelector('.delivery-option.selected');
+      
+      document.querySelectorAll('.error-message').forEach(err => err.style.display = 'none');
+      document.querySelectorAll('.form-group input').forEach(input => input.classList.remove('error'));
+      
+      let hasErrors = false;
+      
+      if (!firstName) {
+        showError('firstName', 'Il nome è obbligatorio');
+        hasErrors = true;
+      }
+      if (!lastName) {
+        showError('lastName', 'Il cognome è obbligatorio');
+        hasErrors = true;
+      }
+      if (!address) {
+        showError('address', 'L\'indirizzo è obbligatorio');
+        hasErrors = true;
+      }
+      
+      if (hasErrors) return;
+      
+      const product = products.find(p => p.id === productId);
+      const deliveryMethod = selectedDelivery.dataset.value === 'home' ? 'Consegna a domicilio' : 'Click & Collect';
+      
+      const orderData = {
+        firstName,
+        lastName,
+        shippingAddress: address,
+        productTitle: product.title,
+        productPrice: product.price,
+        deliveryMethod
+      };
+      
+      renderSuccess(orderData);
+    }
+    
+    function showError(fieldId, message) {
+      const field = document.getElementById(fieldId);
+      const errorElement = field.parentElement.querySelector('.error-message');
+      field.classList.add('error');
+      errorElement.textContent = message;
+      errorElement.style.display = 'block';
+    }
+
+    // Global functions
+    window.showProduct = function(id) {
+      const product = products.find(p => p.id === id);
+      if (product) {
+        renderProductDetail(product);
+      }
+    };
+
+    window.goToCheckout = function(productId) {
+      const product = products.find(p => p.id === productId);
+      if (!product) return;
+      const variant = Math.floor(Math.random() * 4) + 1;
+      renderCheckout(product, variant);
+    };
+
+    window.startFinalSurvey = function() {
+      isInFinalSurvey = true;
+      finalSurveyPage = 0;
+      finalSurveyAnswers = {};
+      const app = document.getElementById('app-content');
+      app.innerHTML = `
+        <div class="container" id="main-content">
+           <!-- Final survey content will be injected here -->
+        </div>
+      `;
+      renderFinalSurvey();
+    };
+
+    window.selectFinalAnswer = function(questionId, value) {
+      finalSurveyAnswers[questionId] = value;
+      renderFinalSurvey();
+    };
+
+    window.selectFinalLikert = function(questionId, value) {
+      finalSurveyAnswers[questionId] = value;
+      const submitBtn = document.querySelector('.btn-submit');
+      if (allFinalLikertAnswered() && submitBtn) {
+        submitBtn.disabled = false;
+      }
+    };
+
+    window.nextFinalPage = function() {
+      finalSurveyPage++;
+      renderFinalSurvey();
+    };
+
+    window.prevFinalPage = function() {
+      if (finalSurveyPage > 0) {
+        finalSurveyPage--;
+        renderFinalSurvey();
+      }
+    };
+
+    // Final Survey functions
+
+    function renderFinalSurvey() {
+      const main = document.getElementById('main-content');
+      const totalPages = finalSurveyQuestions.length + 2; // +1 for likert, +1 for thank you
+      const progressPercent = (finalSurveyPage / totalPages) * 100;
+      
+      if (finalSurveyPage < finalSurveyQuestions.length) {
+        // Regular questions
+        const question = finalSurveyQuestions[finalSurveyPage];
+        main.innerHTML = `
+          <div class="survey-container">
+            <div class="survey-header">
+              <h1>VU VRIJE UNIVERSITEIT AMSTERDAM</h1>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${progressPercent}%"></div>
+            </div>
+            <div class="question-group">
+              <div class="question-title">${question.title}</div>
+              ${question.subtitle ? `<div style="font-style: italic; margin-bottom: 1rem; color: #555;">${question.subtitle}</div>` : ''}
+              <table class="likert-table" style="margin-top: 1.5rem;">
+                <thead>
+                  <tr>
+                    <th></th>
+                    ${question.options.map(opt => `<th>${opt.label}</th>`).join('')}
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="text-align: left; padding-left: 1rem;">Frequenza</td>
+                    ${question.options.map(opt => `
+                      <td>
+                        <input type="radio" name="${question.id}" value="${opt.value}" 
+                               onchange="selectFinalAnswer('${question.id}', '${opt.value}')"
+                               ${finalSurveyAnswers[question.id] === opt.value ? 'checked' : ''}>
+                      </td>
+                    `).join('')}
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="survey-buttons">
+              <button class="btn-survey btn-prev" onclick="prevFinalPage()" ${finalSurveyPage === 0 ? 'disabled' : ''}>
+                Indietro
+              </button>
+              <button class="btn-survey btn-next" onclick="nextFinalPage()" 
+                      ${!finalSurveyAnswers[question.id] ? 'disabled' : ''}>
+                Avanti
+              </button>
+            </div>
+          </div>
+        `;
+      } else if (finalSurveyPage === finalSurveyQuestions.length) {
+        // Likert scale page
+        main.innerHTML = `
+          <div class="survey-container">
+            <div class="survey-header">
+              <h1>VU VRIJE UNIVERSITEIT AMSTERDAM</h1>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${progressPercent}%"></div>
+            </div>
+            <div class="question-group">
+              <div class="question-title">Indica quanto sei d'accordo con ciascuna delle seguenti affermazioni:</div>
+              <table class="likert-table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    ${finalLikertScale.map((scale, i) => `<th>${scale}</th>`).join('')}
+                  </tr>
+                </thead>
+                <tbody>
+                  ${finalLikertQuestions.map(q => `
+                    <tr>
+                      <td>${q.text}</td>
+                      ${finalLikertScale.map((scale, i) => `
+                        <td>
+                          <input type="radio" name="${q.id}" value="${i}" 
+                                 onchange="selectFinalLikert('${q.id}', ${i})"
+                                 ${finalSurveyAnswers[q.id] == i ? 'checked' : ''}>
+                        </td>
+                      `).join('')}
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+            <div class="survey-buttons">
+              <button class="btn-survey btn-prev" onclick="prevFinalPage()">Indietro</button>
+              <button class="btn-survey btn-submit" onclick="nextFinalPage()" 
+                      ${!allFinalLikertAnswered() ? 'disabled' : ''}>
+                Avanti
+              </button>
+            </div>
+          </div>
+        `;
+      } else {
+        // Thank you page
+        main.innerHTML = `
+          <div class="survey-container">
+            <div class="survey-header">
+              <h1>VU VRIJE UNIVERSITEIT AMSTERDAM</h1>
+            </div>
+            <div style="text-align: center; padding: 3rem 2rem;">
+              <p style="font-size: 1.2rem; color: #666; line-height: 1.6; margin-bottom: 1rem;">
+                We thank you for your time spent taking this survey.
+              </p>
+              <p style="font-size: 1.2rem; color: #666; line-height: 1.6;">
+                Your response has been recorded.
+              </p>
+            </div>
+          </div>
+        `;
+        console.log('Final survey completed:', finalSurveyAnswers);
+      }
+    }
+
+    function allFinalLikertAnswered() {
+      return finalLikertQuestions.every(q => finalSurveyAnswers[q.id] !== undefined);
+    }
+
+    // Initialize
+    if (isInSurvey) {
+      renderSurvey();
+    } else {
+      startEcommerce();
+    }
+  </script>
+</body>
+</html> 
