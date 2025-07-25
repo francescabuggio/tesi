@@ -619,12 +619,14 @@
 
   <script>
     // Survey data e stato
-    let currentPage = 0;
+    let currentPage = -1; // Inizia da -1 per la pagina introduttiva
     let surveyAnswers = {};
     let isInSurvey = true;
     let isInFinalSurvey = false;
     let finalSurveyPage = 0;
     let finalSurveyAnswers = {};
+    let likertPage = 0; // Per paginazione domande Likert
+    let likertAnswers = {}; // Risposte Likert separate
     let allSurveyData = {}; // Store completo di tutti i dati
     let checkoutStartTime = null; // Per tracciare tempo nel checkout
     let productClickTimes = {}; // Per tracciare tempi di click sui prodotti
@@ -634,31 +636,24 @@
     const products = [
       {
         id: 1,
-        title: "Tazza Speckled Bianca",
-        price: "€24,90",
+        title: "CERAMICA 1",
+        price: "€29,90",
         image: "product1.png",
         description: "Tazza artigianale in ceramica con delicati puntini neri. Ogni pezzo è unico, modellato a mano con argilla locale di alta qualità. Perfetta per il tuo rituale del caffè mattutino."
       },
       {
         id: 2,
-        title: "Set Ciotole Splash Blu", 
-        price: "€45,90",
+        title: "CERAMICA 2", 
+        price: "€29,90",
         image: "product2.png",
         description: "Elegante set di due ciotole in ceramica con affascinante pattern splash blu. Ideali per servire o come raffinato elemento decorativo. Realizzate con smalti naturali."
       },
       {
         id: 3,
-        title: "Teiera Galaxy Nera",
-        price: "€65,90",
+        title: "CERAMICA 3",
+        price: "€29,90",
         image: "product3.png",
         description: "Straordinaria teiera artigianale con suggestivo effetto galaxy. Argilla nera impreziosita da riflessi dorati. Un vero pezzo d'arte per le tue cerimonie del tè."
-      },
-      {
-        id: 4,
-        title: "Tazza Constellation",
-        price: "€28,90",
-        image: "product1.png",
-        description: "Tazza unica con poetico motivo a costellazione. Ogni puntino racconta una storia millenaria. Realizzata con antiche tecniche di ceramica tradizionale."
       }
     ];
 
@@ -800,6 +795,13 @@
       'Totalmente d\'accordo'
     ];
 
+    // Dividi domande Likert in gruppi di 5
+    const LIKERT_PER_PAGE = 5;
+    const likertGroups = [];
+    for (let i = 0; i < likertQuestions.length; i += LIKERT_PER_PAGE) {
+      likertGroups.push(likertQuestions.slice(i, i + LIKERT_PER_PAGE));
+    }
+
     // Final survey questions
     const finalSurveyQuestions = [
       {
@@ -865,15 +867,44 @@
     // Survey functions
     function renderSurvey() {
       const app = document.getElementById('app-content');
-      const totalPages = surveyQuestions.length + 1;
-      const progressPercent = (currentPage / totalPages) * 100;
+      const totalPages = surveyQuestions.length + likertGroups.length + 1; // +1 per intro
+      const progressPercent = ((currentPage + 1) / totalPages) * 100;
       
-      if (currentPage < surveyQuestions.length) {
+      if (currentPage === -1) {
+        // Pagina introduttiva
+        app.innerHTML = `
+          <div class="survey-container">
+            <div class="survey-header">
+              <h1>SONDAGGIO ECOMMERCE - UNITO</h1>
+            </div>
+            <div style="text-align: center; padding: 2rem;">
+              <h2 style="color: #8b6952; margin-bottom: 2rem;">Caro partecipante,</h2>
+              <div style="background: rgba(255,248,240,0.8); padding: 2rem; border-radius: 16px; margin-bottom: 2rem; border-left: 4px solid #8b6952;">
+                <p style="font-size: 1.1rem; line-height: 1.6; margin-bottom: 1rem;">
+                  La compilazione del questionario richiederà <strong>5-6 minuti</strong>. La partecipazione a questo studio non 
+                  è obbligatoria; il questionario è completamente anonimo e i dati saranno utilizzati 
+                  esclusivamente per la ricerca.
+                </p>
+                <p style="font-size: 1rem; line-height: 1.6; margin-bottom: 1rem; font-style: italic;">
+                  In questo questionario non ci sono risposte giuste o sbagliate: ci interessano solo 
+                  le tue opinioni e preferenze.
+                </p>
+                <p style="font-size: 1rem; line-height: 1.6; color: #d4951a; font-weight: bold;">
+                  Sei pregato di portarlo alla fine.
+                </p>
+              </div>
+              <button class="btn-survey btn-next" onclick="nextPage()" style="background: #8b6952; padding: 1rem 2rem; font-size: 1.1rem;">
+                Inizia il questionario
+              </button>
+            </div>
+          </div>
+        `;
+      } else if (currentPage < surveyQuestions.length) {
         const question = surveyQuestions[currentPage];
         app.innerHTML = `
           <div class="survey-container">
             <div class="survey-header">
-              <h1>VU VRIJE UNIVERSITEIT AMSTERDAM</h1>
+              <h1>SONDAGGIO ECOMMERCE - UNITO</h1>
             </div>
             <div class="progress-bar">
               <div class="progress-fill" style="width: ${progressPercent}%"></div>
@@ -892,7 +923,7 @@
               </div>
             </div>
             <div class="survey-buttons">
-              <button class="btn-survey btn-prev" onclick="prevPage()" ${currentPage === 0 ? 'disabled' : ''}>
+              <button class="btn-survey btn-prev" onclick="prevPage()" ${currentPage <= 0 ? 'disabled' : ''}>
                 Indietro
               </button>
               <button class="btn-survey btn-next" onclick="nextPage()" 
@@ -902,49 +933,84 @@
             </div>
           </div>
         `;
-      } else if (currentPage === surveyQuestions.length) {
-        app.innerHTML = `
-          <div class="survey-container">
-            <div class="survey-header">
-              <h1>VU VRIJE UNIVERSITEIT AMSTERDAM</h1>
-            </div>
-            <div class="progress-bar">
-              <div class="progress-fill" style="width: ${progressPercent}%"></div>
-            </div>
-            <div class="question-group">
-              <div class="question-title">Indica quanto sei d'accordo con ciascuna delle seguenti affermazioni:</div>
-              <table class="likert-table">
-                <thead>
-                  <tr>
-                    <th></th>
-                    ${likertScale.map((scale, i) => `<th>${scale}</th>`).join('')}
-                  </tr>
-                </thead>
-                <tbody>
-                  ${likertQuestions.map(q => `
+      } else if (currentPage >= surveyQuestions.length) {
+        // Gestione pagine Likert
+        const actualLikertPage = currentPage - surveyQuestions.length;
+        const totalLikertPages = likertGroups.length;
+        
+        if (actualLikertPage < totalLikertPages) {
+          const currentQuestions = likertGroups[actualLikertPage];
+          const likertProgress = ((actualLikertPage + 1) / totalLikertPages) * 100;
+          
+          app.innerHTML = `
+            <div class="survey-container">
+              <div class="survey-header">
+                <h1>SONDAGGIO ECOMMERCE - UNITO</h1>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: ${progressPercent}%"></div>
+              </div>
+              <div class="question-group">
+                <div class="question-title">
+                  Indica quanto sei d'accordo con ciascuna delle seguenti affermazioni:
+                  <span style="font-size: 0.9rem; color: #666; display: block; margin-top: 0.5rem;">
+                    (Pagina ${actualLikertPage + 1} di ${totalLikertPages})
+                  </span>
+                </div>
+                
+                <!-- Legenda -->
+                <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.85rem;">
+                  <strong>Legenda:</strong><br>
+                  1 = Totalmente in disaccordo | 2 = Molto in disaccordo | 3 = Abbastanza in disaccordo | 
+                  4 = Né d'accordo né in disaccordo | 5 = Abbastanza d'accordo | 6 = Molto d'accordo | 7 = Totalmente d'accordo
+                </div>
+                
+                <table class="likert-table" style="width: 100%; border-collapse: collapse;">
+                  <thead>
                     <tr>
-                      <td>${q.text}</td>
-                      ${likertScale.map((scale, i) => `
-                        <td>
-                          <input type="radio" name="${q.id}" value="${i}" 
-                                 onchange="selectLikert('${q.id}', ${i})"
-                                 ${surveyAnswers[q.id] == i ? 'checked' : ''}>
-                        </td>
-                      `).join('')}
+                      <th style="width: 60%; text-align: left; padding: 0.8rem; background: #f8f9fa;">Affermazione</th>
+                      <th style="width: 5.7%; text-align: center; padding: 0.8rem; background: #f8f9fa;">1</th>
+                      <th style="width: 5.7%; text-align: center; padding: 0.8rem; background: #f8f9fa;">2</th>
+                      <th style="width: 5.7%; text-align: center; padding: 0.8rem; background: #f8f9fa;">3</th>
+                      <th style="width: 5.7%; text-align: center; padding: 0.8rem; background: #f8f9fa;">4</th>
+                      <th style="width: 5.7%; text-align: center; padding: 0.8rem; background: #f8f9fa;">5</th>
+                      <th style="width: 5.7%; text-align: center; padding: 0.8rem; background: #f8f9fa;">6</th>
+                      <th style="width: 5.7%; text-align: center; padding: 0.8rem; background: #f8f9fa;">7</th>
                     </tr>
-                  `).join('')}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    ${currentQuestions.map(q => `
+                      <tr>
+                        <td style="padding: 0.8rem; border-bottom: 1px solid #eee; font-size: 0.9rem;">${q.text}</td>
+                        ${[0,1,2,3,4,5,6].map(i => `
+                          <td style="padding: 0.8rem; text-align: center; border-bottom: 1px solid #eee;">
+                            <input type="radio" name="${q.id}" value="${i}" 
+                                   onchange="selectLikert('${q.id}', ${i})"
+                                   ${likertAnswers[q.id] == i ? 'checked' : ''}
+                                   style="transform: scale(1.2);">
+                          </td>
+                        `).join('')}
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+              <div class="survey-buttons">
+                <button class="btn-survey btn-prev" onclick="prevPage()">Indietro</button>
+                ${actualLikertPage === totalLikertPages - 1 ? 
+                  `<button class="btn-survey btn-submit" onclick="completeSurvey()" 
+                           ${!allCurrentLikertAnswered(currentQuestions) ? 'disabled' : ''}>
+                     Completa questionario
+                   </button>` :
+                  `<button class="btn-survey btn-next" onclick="nextPage()" 
+                           ${!allCurrentLikertAnswered(currentQuestions) ? 'disabled' : ''}>
+                     Avanti
+                   </button>`
+                }
+              </div>
             </div>
-            <div class="survey-buttons">
-              <button class="btn-survey btn-prev" onclick="prevPage()">Indietro</button>
-              <button class="btn-survey btn-submit" onclick="completeSurvey()" 
-                      ${!allLikertAnswered() ? 'disabled' : ''}>
-                Completa questionario
-              </button>
-            </div>
-          </div>
-        `;
+          `;
+        }
       }
     }
 
@@ -954,26 +1020,30 @@
     }
 
     function selectLikert(questionId, value) {
-      surveyAnswers[questionId] = value;
-      const submitBtn = document.querySelector('.btn-submit');
-      if (allLikertAnswered()) {
-        submitBtn.disabled = false;
-      }
+      likertAnswers[questionId] = value;
+      renderSurvey(); // Re-render per aggiornare stato pulsanti
+    }
+
+    function allCurrentLikertAnswered(currentQuestions) {
+      return currentQuestions.every(q => likertAnswers[q.id] !== undefined);
     }
 
     function allLikertAnswered() {
-      return likertQuestions.every(q => surveyAnswers[q.id] !== undefined);
+      return likertQuestions.every(q => likertAnswers[q.id] !== undefined);
     }
 
     function nextPage() {
-      if (currentPage < surveyQuestions.length) {
+      const maxLikertPages = likertGroups.length;
+      const maxTotalPages = surveyQuestions.length + maxLikertPages;
+      
+      if (currentPage < maxTotalPages - 1) {
         currentPage++;
         renderSurvey();
       }
     }
 
     function prevPage() {
-      if (currentPage > 0) {
+      if (currentPage > -1) {
         currentPage--;
         renderSurvey();
       }
@@ -981,7 +1051,11 @@
 
     function completeSurvey() {
       console.log('Initial survey completed:', surveyAnswers);
-      allSurveyData.initialSurvey = surveyAnswers;
+      console.log('Likert answers completed:', likertAnswers);
+      
+      // Combina le risposte
+      const combinedAnswers = { ...surveyAnswers, ...likertAnswers };
+      allSurveyData.initialSurvey = combinedAnswers;
       allSurveyData.initialSurveyCompletedAt = new Date().toISOString();
       isInSurvey = false;
       showScenario();
@@ -1248,7 +1322,7 @@
         main.innerHTML = `
           <div class="survey-container">
             <div class="survey-header">
-              <h1>VU VRIJE UNIVERSITEIT AMSTERDAM</h1>
+              <h1>SONDAGGIO ECOMMERCE - UNITO</h1>
             </div>
             <div class="progress-bar">
               <div class="progress-fill" style="width: ${progressPercent}%"></div>
@@ -1292,7 +1366,7 @@
         main.innerHTML = `
           <div class="survey-container">
             <div class="survey-header">
-              <h1>VU VRIJE UNIVERSITEIT AMSTERDAM</h1>
+              <h1>SONDAGGIO ECOMMERCE - UNITO</h1>
             </div>
             <div class="progress-bar">
               <div class="progress-fill" style="width: ${progressPercent}%"></div>
@@ -1336,7 +1410,7 @@
         main.innerHTML = `
           <div class="survey-container">
             <div class="survey-header">
-              <h1>VU VRIJE UNIVERSITEIT AMSTERDAM</h1>
+              <h1>SONDAGGIO ECOMMERCE - UNITO</h1>
             </div>
             <div style="text-align: center; padding: 3rem 2rem;">
               <p style="font-size: 1.2rem; color: #666; line-height: 1.6; margin-bottom: 1rem;">
