@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Supabase Local</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        input, select {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Supabase Locale</h1>
+        <p>Test diretto della connessione a Supabase dal browser</p>
+
+        <div class="form-group">
+            <label>Test rapido dati:</label>
+            <input type="text" id="testName" placeholder="Nome test" value="Test utente">
+            <select id="testAge">
+                <option value="under18">Sotto 18</option>
+                <option value="18-25">18-25</option>
+                <option value="26-35">26-35</option>
+                <option value="over35">Oltre 35</option>
+            </select>
+            <select id="testGender">
+                <option value="male">Maschio</option>
+                <option value="female">Femmina</option>
+                <option value="other">Altro</option>
+            </select>
+        </div>
+
+        <button onclick="testConnection()">🔗 Test Connessione</button>
+        <button onclick="insertTestData()">💾 Inserisci Dati Test</button>
+        <button onclick="readAllData()">📖 Leggi Tutti i Dati</button>
+        <button onclick="clearResults()">🧹 Pulisci</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // Configurazione Supabase
+        const SUPABASE_URL = 'https://zzytokqhoaqslwdsmijz.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6eXRva3Fob2Fxc2x3ZHNtaWp6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0NTI5OTQsImV4cCI6MjA2OTAyODk5NH0.SqaQfe68M2iGebGYnSNZfjfWmfpXEEhVKJ1HWK2g6K0';
+
+        // Inizializza Supabase
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        function showResult(message, type = 'info') {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = `result ${type}`;
+            resultDiv.textContent = message;
+            console.log(message);
+        }
+
+        async function testConnection() {
+            showResult('🔄 Testing connessione a Supabase...', 'info');
+            
+            try {
+                // Test semplice: prova a fare una query sulla tabella
+                const { data, error } = await supabase
+                    .from('responses')
+                    .select('count', { count: 'exact', head: true });
+
+                if (error) {
+                    throw error;
+                }
+
+                showResult(`✅ CONNESSIONE OK!\nTabella 'responses' trovata.\nRecord attuali: ${data || 0}`, 'success');
+            } catch (error) {
+                showResult(`❌ ERRORE CONNESSIONE:\n${error.message}\n\nDettagli: ${JSON.stringify(error, null, 2)}`, 'error');
+            }
+        }
+
+        async function insertTestData() {
+            showResult('💾 Inserendo dati di test...', 'info');
+            
+            try {
+                const testData = {
+                    timestamp: new Date().toISOString(),
+                    sessionId: 'test-' + Date.now(),
+                    testName: document.getElementById('testName').value,
+                    initialSurvey: {
+                        age: document.getElementById('testAge').value,
+                        gender: document.getElementById('testGender').value,
+                        device: 'computer',
+                        education: 'diploma'
+                    },
+                    finalSurvey: {
+                        environmental_consideration: 'sometimes',
+                        feel_responsible: 3
+                    },
+                    totalTimeSpent: 120000,
+                    isTest: true
+                };
+
+                const { data, error } = await supabase
+                    .from('responses')
+                    .insert([{ data: testData }])
+                    .select();
+
+                if (error) {
+                    throw error;
+                }
+
+                showResult(`✅ DATI INSERITI CON SUCCESSO!\n\nID Supabase: ${data[0].id}\nSession ID: ${testData.sessionId}\n\nDati salvati:\n${JSON.stringify(testData, null, 2)}`, 'success');
+            } catch (error) {
+                showResult(`❌ ERRORE INSERIMENTO:\n${error.message}\n\nDettagli: ${JSON.stringify(error, null, 2)}`, 'error');
+            }
+        }
+
+        async function readAllData() {
+            showResult('📖 Leggendo tutti i dati...', 'info');
+            
+            try {
+                const { data, error } = await supabase
+                    .from('responses')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    throw error;
+                }
+
+                showResult(`✅ DATI LETTI CON SUCCESSO!\n\nTotale record: ${data.length}\n\n${data.map((row, index) => 
+                    `${index + 1}. ID: ${row.id}\n   Session: ${row.data?.sessionId || 'N/A'}\n   Timestamp: ${row.data?.timestamp || 'N/A'}\n   Test: ${row.data?.isTest ? 'SÌ' : 'NO'}\n`
+                ).join('\n')}`, 'success');
+            } catch (error) {
+                showResult(`❌ ERRORE LETTURA:\n${error.message}\n\nDettagli: ${JSON.stringify(error, null, 2)}`, 'error');
+            }
+        }
+
+        function clearResults() {
+            document.getElementById('result').textContent = '';
+        }
+
+        // Test automatico all'apertura
+        window.onload = function() {
+            showResult('🚀 Pagina caricata. Premi "Test Connessione" per iniziare.', 'info');
+        };
+    </script>
+</body>
+</html> 
