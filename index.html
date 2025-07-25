@@ -627,8 +627,6 @@
     let finalSurveyAnswers = {};
     let likertPage = 0; // Per paginazione domande Likert
     let likertAnswers = {}; // Risposte Likert separate
-    let finalLikertPage = 0; // Per paginazione domande finali Likert
-    let finalLikertAnswers = {}; // Risposte finali Likert separate
     let allSurveyData = {}; // Store completo di tutti i dati
     let checkoutStartTime = null; // Per tracciare tempo nel checkout
     let productClickTimes = {}; // Per tracciare tempi di click sui prodotti
@@ -865,12 +863,6 @@
       'Molto d\'accordo',
       'Totalmente d\'accordo'
     ];
-
-    // Dividi domande finali Likert in gruppi di 5
-    const finalLikertGroups = [];
-    for (let i = 0; i < finalLikertQuestions.length; i += LIKERT_PER_PAGE) {
-      finalLikertGroups.push(finalLikertQuestions.slice(i, i + LIKERT_PER_PAGE));
-    }
 
     // Survey functions
     function renderSurvey() {
@@ -1240,7 +1232,8 @@
           <div class="success-icon">🎉</div>
           <h2 class="success-title">Ordine Completato!</h2>
           <p class="success-message">
-            Ciao ${orderData.firstName}! Il tuo ordine è stato ricevuto con successo.
+            Ciao ${orderData.firstName}! Il tuo ordine è stato ricevuto con successo.<br>
+            Riceverai una email di conferma a breve.
           </p>
           
           <div class="order-summary">
@@ -1321,8 +1314,8 @@
     // Final Survey functions
     function renderFinalSurvey() {
       const main = document.getElementById('main-content');
-      const totalPages = finalSurveyQuestions.length + finalLikertGroups.length + 1;
-      const progressPercent = ((finalSurveyPage + 1) / totalPages) * 100;
+      const totalPages = finalSurveyQuestions.length + 2;
+      const progressPercent = (finalSurveyPage / totalPages) * 100;
       
       if (finalSurveyPage < finalSurveyQuestions.length) {
         const question = finalSurveyQuestions[finalSurveyPage];
@@ -1369,125 +1362,79 @@
             </div>
           </div>
         `;
-      } else if (finalSurveyPage >= finalSurveyQuestions.length) {
-        // Gestione pagine Likert finali
-        const actualLikertPage = finalSurveyPage - finalSurveyQuestions.length;
-        const totalLikertPages = finalLikertGroups.length;
-        
-        if (actualLikertPage < totalLikertPages) {
-          const currentQuestions = finalLikertGroups[actualLikertPage];
-          
-          main.innerHTML = `
-            <div class="survey-container">
-              <div class="survey-header">
-                <h1>SONDAGGIO ECOMMERCE - UNITO</h1>
-              </div>
-              <div class="progress-bar">
-                <div class="progress-fill" style="width: ${progressPercent}%"></div>
-              </div>
-              <div class="question-group">
-                <div class="question-title">
-                  Indica quanto sei d'accordo con ciascuna delle seguenti affermazioni:
-                  <span style="font-size: 0.9rem; color: #666; display: block; margin-top: 0.5rem;">
-                    (Pagina ${actualLikertPage + 1} di ${totalLikertPages})
-                  </span>
-                </div>
-                
-                <!-- Legenda -->
-                <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.85rem;">
-                  <strong>Legenda:</strong><br>
-                  1 = Totalmente in disaccordo | 2 = Molto in disaccordo | 3 = Abbastanza in disaccordo | 
-                  4 = Né d'accordo né in disaccordo | 5 = Abbastanza d'accordo | 6 = Molto d'accordo | 7 = Totalmente d'accordo
-                </div>
-                
-                <table class="likert-table" style="width: 100%; border-collapse: collapse;">
-                  <thead>
+      } else if (finalSurveyPage === finalSurveyQuestions.length) {
+        main.innerHTML = `
+          <div class="survey-container">
+            <div class="survey-header">
+              <h1>SONDAGGIO ECOMMERCE - UNITO</h1>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${progressPercent}%"></div>
+            </div>
+            <div class="question-group">
+              <div class="question-title">Indica quanto sei d'accordo con ciascuna delle seguenti affermazioni:</div>
+              <table class="likert-table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    ${finalLikertScale.map((scale, i) => `<th>${scale}</th>`).join('')}
+                  </tr>
+                </thead>
+                <tbody>
+                  ${finalLikertQuestions.map(q => `
                     <tr>
-                      <th style="width: 60%; text-align: left; padding: 0.8rem; background: #f8f9fa;">Affermazione</th>
-                      <th style="width: 5.7%; text-align: center; padding: 0.8rem; background: #f8f9fa;">1</th>
-                      <th style="width: 5.7%; text-align: center; padding: 0.8rem; background: #f8f9fa;">2</th>
-                      <th style="width: 5.7%; text-align: center; padding: 0.8rem; background: #f8f9fa;">3</th>
-                      <th style="width: 5.7%; text-align: center; padding: 0.8rem; background: #f8f9fa;">4</th>
-                      <th style="width: 5.7%; text-align: center; padding: 0.8rem; background: #f8f9fa;">5</th>
-                      <th style="width: 5.7%; text-align: center; padding: 0.8rem; background: #f8f9fa;">6</th>
-                      <th style="width: 5.7%; text-align: center; padding: 0.8rem; background: #f8f9fa;">7</th>
+                      <td>${q.text}</td>
+                      ${finalLikertScale.map((scale, i) => `
+                        <td>
+                          <input type="radio" name="${q.id}" value="${i}" 
+                                 onchange="selectFinalLikert('${q.id}', ${i})"
+                                 ${finalSurveyAnswers[q.id] == i ? 'checked' : ''}>
+                        </td>
+                      `).join('')}
                     </tr>
-                  </thead>
-                  <tbody>
-                    ${currentQuestions.map(q => `
-                      <tr>
-                        <td style="padding: 0.8rem; border-bottom: 1px solid #eee; font-size: 0.9rem;">${q.text}</td>
-                        ${[0,1,2,3,4,5,6].map(i => `
-                          <td style="padding: 0.8rem; text-align: center; border-bottom: 1px solid #eee;">
-                            <input type="radio" name="${q.id}" value="${i}" 
-                                   onchange="selectFinalLikert('${q.id}', ${i})"
-                                   ${finalLikertAnswers[q.id] == i ? 'checked' : ''}
-                                   style="transform: scale(1.2);">
-                          </td>
-                        `).join('')}
-                      </tr>
-                    `).join('')}
-                  </tbody>
-                </table>
-              </div>
-              <div class="survey-buttons">
-                <button class="btn-survey btn-prev" onclick="prevFinalPage()">Indietro</button>
-                ${actualLikertPage === totalLikertPages - 1 ? 
-                  `<button class="btn-survey btn-submit" onclick="completeFinalSurvey()" 
-                           ${!allCurrentFinalLikertAnswered(currentQuestions) ? 'disabled' : ''}>
-                     Completa questionario
-                   </button>` :
-                  `<button class="btn-survey btn-next" onclick="nextFinalPage()" 
-                           ${!allCurrentFinalLikertAnswered(currentQuestions) ? 'disabled' : ''}>
-                     Avanti
-                   </button>`
-                }
-              </div>
+                  `).join('')}
+                </tbody>
+              </table>
             </div>
-          `;
-        } else {
-          // Thank you page - this is where we save the data
-          main.innerHTML = `
-            <div class="survey-container">
-              <div class="survey-header">
-                <h1>SONDAGGIO ECOMMERCE - UNITO</h1>
-              </div>
-              <div style="text-align: center; padding: 3rem 2rem;">
-                <p style="font-size: 1.2rem; color: #666; line-height: 1.6; margin-bottom: 1rem;">
-                  Grazie per aver partecipato al nostro studio.
-                </p>
-                <p style="font-size: 1rem; color: #666; line-height: 1.6;">
-                  Le tue risposte sono state salvate con successo.
-                </p>
-              </div>
+            <div class="survey-buttons">
+              <button class="btn-survey btn-prev" onclick="prevFinalPage()">Indietro</button>
+              <button class="btn-survey btn-submit" onclick="completeFinalSurvey()" 
+                      ${!allFinalLikertAnswered() ? 'disabled' : ''}>
+                Avanti
+              </button>
             </div>
-          `;
-          // Salva i dati
-          saveAllSurveyData();
-        }
+          </div>
+        `;
+      } else {
+        // Thank you page - this is where we save the data
+        main.innerHTML = `
+          <div class="survey-container">
+            <div class="survey-header">
+              <h1>SONDAGGIO ECOMMERCE - UNITO</h1>
+            </div>
+            <div style="text-align: center; padding: 3rem 2rem;">
+              <p style="font-size: 1.2rem; color: #666; line-height: 1.6; margin-bottom: 1rem;">
+                We thank you for your time spent taking this survey.
+              </p>
+              <p style="font-size: 1.2rem; color: #666; line-height: 1.6;">
+                Your response has been recorded.
+              </p>
+            </div>
+          </div>
+        `;
+        
+        // Save all data here
+        saveAllSurveyData();
       }
     }
 
-    function selectFinalLikert(questionId, value) {
-      finalLikertAnswers[questionId] = value;
-      renderFinalSurvey(); // Re-render per aggiornare stato pulsanti
-    }
-
-    function allCurrentFinalLikertAnswered(currentQuestions) {
-      return currentQuestions.every(q => finalLikertAnswers[q.id] !== undefined);
-    }
-
     function allFinalLikertAnswered() {
-      return finalLikertQuestions.every(q => finalLikertAnswers[q.id] !== undefined);
+      return finalLikertQuestions.every(q => finalSurveyAnswers[q.id] !== undefined);
     }
 
     function completeFinalSurvey() {
       console.log('Final survey completed:', finalSurveyAnswers);
-      console.log('Final Likert answers completed:', finalLikertAnswers);
-      
-      // Combina le risposte finali
-      const combinedFinalAnswers = { ...finalSurveyAnswers, ...finalLikertAnswers };
-      allSurveyData.finalSurvey = combinedFinalAnswers;
+      allSurveyData.finalSurvey = finalSurveyAnswers;
       allSurveyData.finalSurveyCompletedAt = new Date().toISOString();
       finalSurveyPage++;
       renderFinalSurvey();
@@ -1575,13 +1522,8 @@
     };
 
     window.nextFinalPage = function() {
-      const maxLikertPages = finalLikertGroups.length;
-      const maxTotalPages = finalSurveyQuestions.length + maxLikertPages;
-      
-      if (finalSurveyPage < maxTotalPages) {
-        finalSurveyPage++;
-        renderFinalSurvey();
-      }
+      finalSurveyPage++;
+      renderFinalSurvey();
     };
 
     window.prevFinalPage = function() {
