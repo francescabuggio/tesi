@@ -54,16 +54,31 @@ module.exports = async function handler(req, res) {
     const stats = {
       totalResponses: surveyData.length,
       lastUpdate: surveyData.length > 0 ? surveyData[0].timestamp : null,
+      
+      // Demografia base
       ageDistribution: calculateAgeDistribution(surveyData),
       genderDistribution: calculateGenderDistribution(surveyData),
-      averageCompletionTime: calculateAverageTime(surveyData),
       educationDistribution: calculateEducationDistribution(surveyData),
       deviceDistribution: calculateDeviceDistribution(surveyData),
+      financialDistribution: calculateFinancialDistribution(surveyData),
+      frequencyDistribution: calculateFrequencyDistribution(surveyData),
+      
+      // Tempi
+      averageCompletionTime: calculateAverageTime(surveyData),
+      averageCheckoutTime: calculateAverageCheckoutTime(surveyData),
+      checkoutTimeRanges: calculateCheckoutTimeRanges(surveyData),
+      
+      // Ecommerce
       productDistribution: calculateProductDistribution(surveyData),
       deliveryDistribution: calculateDeliveryDistribution(surveyData),
-      checkoutTimeRanges: calculateCheckoutTimeRanges(surveyData),
       checkoutVariantDistribution: calculateCheckoutVariantDistribution(surveyData),
-      averageCheckoutTime: calculateAverageCheckoutTime(surveyData)
+      
+      // Survey iniziale (Likert)
+      initialLikertDistributions: calculateInitialLikertDistributions(surveyData),
+      
+      // Survey finale
+      environmentalConsiderationDistribution: calculateEnvironmentalConsiderationDistribution(surveyData),
+      finalLikertDistributions: calculateFinalLikertDistributions(surveyData)
     };
 
     console.log('Statistics calculated:', stats);
@@ -233,4 +248,92 @@ function calculateAverageCheckoutTime(data) {
   const avgSeconds = Math.round(avgMs / 1000);
   
   return `${avgSeconds}s (media su ${times.length} checkout)`;
+}
+
+function calculateFinancialDistribution(data) {
+  const distribution = {};
+  data.forEach(function(response) {
+    if (response.initialSurvey && response.initialSurvey.financial) {
+      const financial = response.initialSurvey.financial;
+      distribution[financial] = (distribution[financial] || 0) + 1;
+    }
+  });
+  return distribution;
+}
+
+function calculateFrequencyDistribution(data) {
+  const distribution = {};
+  data.forEach(function(response) {
+    if (response.initialSurvey && response.initialSurvey.frequency) {
+      const frequency = response.initialSurvey.frequency;
+      distribution[frequency] = (distribution[frequency] || 0) + 1;
+    }
+  });
+  return distribution;
+}
+
+function calculateInitialLikertDistributions(data) {
+  const likertQuestions = [
+    'stress_financial', 'download_files', 'open_tabs', 'find_website', 'get_tired',
+    'end_up_sites', 'confusing_structure', 'easy_shopping', 'buy_unavailable',
+    'save_time', 'easy_compare', 'avoid_hassle', 'enjoy_shopping'
+  ];
+  
+  const distributions = {};
+  
+  likertQuestions.forEach(function(questionId) {
+    distributions[questionId] = {};
+    for (let i = 0; i <= 6; i++) {
+      distributions[questionId][i] = 0;
+    }
+    
+    data.forEach(function(response) {
+      if (response.initialSurvey && response.initialSurvey[questionId] !== undefined) {
+        const value = response.initialSurvey[questionId];
+        if (value >= 0 && value <= 6) {
+          distributions[questionId][value]++;
+        }
+      }
+    });
+  });
+  
+  return distributions;
+}
+
+function calculateEnvironmentalConsiderationDistribution(data) {
+  const distribution = {};
+  data.forEach(function(response) {
+    if (response.finalSurvey && response.finalSurvey.environmental_consideration) {
+      const value = response.finalSurvey.environmental_consideration;
+      distribution[value] = (distribution[value] || 0) + 1;
+    }
+  });
+  return distribution;
+}
+
+function calculateFinalLikertDistributions(data) {
+  const finalLikertQuestions = [
+    'feel_irresponsible', 'feel_guilty', 'feel_responsible', 'difficult_overview',
+    'difficult_design', 'effort_understand', 'difficult_options', 'useful_descriptions'
+  ];
+  
+  const distributions = {};
+  
+  finalLikertQuestions.forEach(function(questionId) {
+    distributions[questionId] = {};
+    for (let i = 0; i <= 6; i++) {
+      distributions[questionId][i] = 0;
+    }
+    
+    data.forEach(function(response) {
+      if (response.finalSurvey && response.finalSurvey[questionId] !== undefined) {
+        const value = response.finalSurvey[questionId];
+        if (value >= 0 && value <= 6) {
+          distributions[questionId][value]++;
+        }
+      }
+    });
+  });
+  
+  return distributions;
 } 

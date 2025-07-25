@@ -172,6 +172,9 @@
       </div>
 
       <!-- Charts -->
+      
+      <!-- Demografia Base -->
+      <h2 style="margin: 2rem 0 1rem 0; color: #333;">📊 Demografia Base</h2>
       <div class="charts-grid">
         <div class="chart-card">
           <div class="chart-title">Distribuzione Età</div>
@@ -186,6 +189,35 @@
           </div>
         </div>
         <div class="chart-card">
+          <div class="chart-title">Educazione</div>
+          <div class="chart-container">
+            <canvas id="educationChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Dispositivo</div>
+          <div class="chart-container">
+            <canvas id="deviceChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Situazione Finanziaria</div>
+          <div class="chart-container">
+            <canvas id="financialChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Frequenza Acquisti</div>
+          <div class="chart-container">
+            <canvas id="frequencyChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ecommerce Data -->
+      <h2 style="margin: 2rem 0 1rem 0; color: #333;">🛒 Dati Ecommerce</h2>
+      <div class="charts-grid">
+        <div class="chart-card">
           <div class="chart-title">Prodotti Scelti</div>
           <div class="chart-container">
             <canvas id="productChart"></canvas>
@@ -198,15 +230,157 @@
           </div>
         </div>
         <div class="chart-card">
+          <div class="chart-title">Varianti Checkout</div>
+          <div class="chart-container">
+            <canvas id="checkoutVariantChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
           <div class="chart-title">Tempo nel Checkout</div>
           <div class="chart-container">
             <canvas id="checkoutTimeChart"></canvas>
           </div>
         </div>
+      </div>
+
+      <!-- Survey Iniziale - Likert -->
+      <h2 style="margin: 2rem 0 1rem 0; color: #333;">📋 Survey Iniziale (Scale Likert 1-7)</h2>
+      <div class="charts-grid">
         <div class="chart-card">
-          <div class="chart-title">Varianti Checkout</div>
+          <div class="chart-title">Stress Finanziario</div>
           <div class="chart-container">
-            <canvas id="checkoutVariantChart"></canvas>
+            <canvas id="stressFinancialChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Aprire File Scaricati</div>
+          <div class="chart-container">
+            <canvas id="downloadFilesChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Aprire Nuove Tab</div>
+          <div class="chart-container">
+            <canvas id="openTabsChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Ritrovare Siti</div>
+          <div class="chart-container">
+            <canvas id="findWebsiteChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Stancarsi Online</div>
+          <div class="chart-container">
+            <canvas id="getTiredChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Finire su Siti Sbagliati</div>
+          <div class="chart-container">
+            <canvas id="endUpSitesChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Struttura Confusa</div>
+          <div class="chart-container">
+            <canvas id="confusingStructureChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Shopping Facile</div>
+          <div class="chart-container">
+            <canvas id="easyShoppingChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Prodotti Non Disponibili</div>
+          <div class="chart-container">
+            <canvas id="buyUnavailableChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Risparmiare Tempo</div>
+          <div class="chart-container">
+            <canvas id="saveTimeChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Confrontare Prodotti</div>
+          <div class="chart-container">
+            <canvas id="easyCompareChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Evitare Fastidi</div>
+          <div class="chart-container">
+            <canvas id="avoidHassleChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Divertirsi Shopping</div>
+          <div class="chart-container">
+            <canvas id="enjoyShoppingChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Survey Finale -->
+      <h2 style="margin: 2rem 0 1rem 0; color: #333;">🌱 Survey Finale</h2>
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-title">Considerazione Ambientale</div>
+          <div class="chart-container">
+            <canvas id="environmentalChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Sentirsi Irresponsabili</div>
+          <div class="chart-container">
+            <canvas id="feelIrresponsibleChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Sentirsi in Colpa</div>
+          <div class="chart-container">
+            <canvas id="feelGuiltyChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Sentirsi Responsabili</div>
+          <div class="chart-container">
+            <canvas id="feelResponsibleChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Overview Difficile</div>
+          <div class="chart-container">
+            <canvas id="difficultOverviewChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Design Difficile</div>
+          <div class="chart-container">
+            <canvas id="difficultDesignChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Sforzo per Capire</div>
+          <div class="chart-container">
+            <canvas id="effortUnderstandChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Opzioni Difficili</div>
+          <div class="chart-container">
+            <canvas id="difficultOptionsChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Descrizioni Utili</div>
+          <div class="chart-container">
+            <canvas id="usefulDescriptionsChart"></canvas>
           </div>
         </div>
       </div>
@@ -242,12 +416,8 @@
 
   <script>
     let surveyData = [];
-    let ageChart = null;
-    let genderChart = null;
-    let productChart = null;
-    let deliveryChart = null;
-    let checkoutTimeChart = null;
-    let checkoutVariantChart = null;
+    // Oggetto per contenere tutti i grafici
+    let charts = {};
 
     async function loadData() {
       try {
@@ -281,13 +451,11 @@
     }
 
     function createCharts(stats) {
-      // Distruggi i grafici esistenti prima di crearne di nuovi
-      if (ageChart) ageChart.destroy();
-      if (genderChart) genderChart.destroy();
-      if (productChart) productChart.destroy();
-      if (deliveryChart) deliveryChart.destroy();
-      if (checkoutTimeChart) checkoutTimeChart.destroy();
-      if (checkoutVariantChart) checkoutVariantChart.destroy();
+      // Distruggi tutti i grafici esistenti
+      Object.values(charts).forEach(chart => {
+        if (chart) chart.destroy();
+      });
+      charts = {};
 
       // Age Chart
       const ageCtx = document.getElementById('ageChart').getContext('2d');
