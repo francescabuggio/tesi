@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Francesca Shop</title>
+  <title>SportPlanet Survey</title>
   <style>
     * {
       box-sizing: border-box;
@@ -246,7 +246,7 @@
       box-shadow: 0 8px 24px rgba(30, 136, 229, 0.4);
     }
     
-    /* Ecommerce Styles (existing) */
+    /* Ecommerce Styles */
     header {
       background: rgba(0,0,0,0.8);
       color: #fff;
@@ -596,7 +596,45 @@
   </div>
 
   <script>
-    // Survey data
+    // Survey data e stato
+    let currentPage = 0;
+    let surveyAnswers = {};
+    let isInSurvey = true;
+    let isInFinalSurvey = false;
+    let finalSurveyPage = 0;
+    let finalSurveyAnswers = {};
+    let allSurveyData = {}; // Store completo di tutti i dati
+    let surveyStartTime = Date.now();
+
+    // Prodotti
+    const products = [
+      {
+        id: 1,
+        title: "Maglietta FC Barcelona 2023/24",
+        price: "€29,90",
+        description: "Maglia ufficiale Home stagione 2023/24. Tessuto tecnico, colori vivaci."
+      },
+      {
+        id: 2,
+        title: "Maglietta Juventus 2023/24", 
+        price: "€29,90",
+        description: "Maglia ufficiale Home stagione 2023/24. Tessuto tecnico, colori vivaci."
+      },
+      {
+        id: 3,
+        title: "Maglietta Manchester United 2023/24",
+        price: "€29,90",
+        description: "Maglia ufficiale Home stagione 2023/24. Tessuto tecnico, colori vivaci."
+      },
+      {
+        id: 4,
+        title: "Maglietta Paris Saint-Germain 2023/24",
+        price: "€29,90",
+        description: "Maglia ufficiale Home stagione 2023/24. Tessuto tecnico, colori vivaci."
+      }
+    ];
+
+    // Initial survey questions
     const surveyQuestions = [
       {
         id: 'age',
@@ -734,42 +772,6 @@
       'Totalmente d\'accordo'
     ];
 
-    // Survey state
-    let currentPage = 0;
-    let surveyAnswers = {};
-    let isInSurvey = true;
-    let isInFinalSurvey = false;
-    let finalSurveyPage = 0;
-    let finalSurveyAnswers = {};
-
-    // Products data (existing)
-    const products = [
-      {
-        id: 1,
-        title: "Maglietta FC Barcelona 2023/24",
-        price: "€29,90",
-        description: "Maglia ufficiale Home stagione 2023/24. Tessuto tecnico, colori vivaci."
-      },
-      {
-        id: 2,
-        title: "Maglietta Juventus 2023/24",
-        price: "€29,90",
-        description: "Maglia ufficiale Home stagione 2023/24. Tessuto tecnico, colori vivaci."
-      },
-      {
-        id: 3,
-        title: "Maglietta Manchester United 2023/24",
-        price: "€29,90",
-        description: "Maglia ufficiale Home stagione 2023/24. Tessuto tecnico, colori vivaci."
-      },
-      {
-        id: 4,
-        title: "Maglietta Paris Saint-Germain 2023/24",
-        price: "€29,90",
-        description: "Maglia ufficiale Home stagione 2023/24. Tessuto tecnico, colori vivaci."
-      }
-    ];
-
     // Final survey questions
     const finalSurveyQuestions = [
       {
@@ -835,11 +837,10 @@
     // Survey functions
     function renderSurvey() {
       const app = document.getElementById('app-content');
-      const totalPages = surveyQuestions.length + 1; // +1 for likert page
+      const totalPages = surveyQuestions.length + 1;
       const progressPercent = (currentPage / totalPages) * 100;
       
       if (currentPage < surveyQuestions.length) {
-        // Regular questions
         const question = surveyQuestions[currentPage];
         app.innerHTML = `
           <div class="survey-container">
@@ -874,7 +875,6 @@
           </div>
         `;
       } else if (currentPage === surveyQuestions.length) {
-        // Likert scale page
         app.innerHTML = `
           <div class="survey-container">
             <div class="survey-header">
@@ -927,7 +927,6 @@
 
     function selectLikert(questionId, value) {
       surveyAnswers[questionId] = value;
-      // Check if all likert questions are answered
       const submitBtn = document.querySelector('.btn-submit');
       if (allLikertAnswered()) {
         submitBtn.disabled = false;
@@ -953,7 +952,9 @@
     }
 
     function completeSurvey() {
-      console.log('Survey completed:', surveyAnswers);
+      console.log('Initial survey completed:', surveyAnswers);
+      allSurveyData.initialSurvey = surveyAnswers;
+      allSurveyData.initialSurveyCompletedAt = new Date().toISOString();
       isInSurvey = false;
       showScenario();
     }
@@ -981,6 +982,7 @@
     }
 
     function startEcommerce() {
+      allSurveyData.ecommerceStartedAt = new Date().toISOString();
       const app = document.getElementById('app-content');
       app.innerHTML = `
         <header>
@@ -993,7 +995,7 @@
       renderHome();
     }
 
-    // Ecommerce functions (existing)
+    // Ecommerce functions
     function renderHome() {
       const main = document.getElementById('main-content');
       main.innerHTML = `
@@ -1052,6 +1054,13 @@
           </div>
         `;
       }
+
+      // Store checkout data
+      allSurveyData.checkoutData = {
+        product: product,
+        variant: variant,
+        checkoutStartedAt: new Date().toISOString()
+      };
 
       main.innerHTML = `
         <button class="btn btn-secondary" onclick="showProduct(${product.id})">← Indietro</button>
@@ -1173,8 +1182,12 @@
         shippingAddress: address,
         productTitle: product.title,
         productPrice: product.price,
-        deliveryMethod
+        deliveryMethod,
+        orderCompletedAt: new Date().toISOString()
       };
+
+      // Store order data
+      allSurveyData.orderData = orderData;
       
       renderSuccess(orderData);
     }
@@ -1185,6 +1198,161 @@
       field.classList.add('error');
       errorElement.textContent = message;
       errorElement.style.display = 'block';
+    }
+
+    // Final Survey functions
+    function renderFinalSurvey() {
+      const main = document.getElementById('main-content');
+      const totalPages = finalSurveyQuestions.length + 2;
+      const progressPercent = (finalSurveyPage / totalPages) * 100;
+      
+      if (finalSurveyPage < finalSurveyQuestions.length) {
+        const question = finalSurveyQuestions[finalSurveyPage];
+        main.innerHTML = `
+          <div class="survey-container">
+            <div class="survey-header">
+              <h1>VU VRIJE UNIVERSITEIT AMSTERDAM</h1>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${progressPercent}%"></div>
+            </div>
+            <div class="question-group">
+              <div class="question-title">${question.title}</div>
+              ${question.subtitle ? `<div style="font-style: italic; margin-bottom: 1rem; color: #555;">${question.subtitle}</div>` : ''}
+              <table class="likert-table" style="margin-top: 1.5rem;">
+                <thead>
+                  <tr>
+                    <th></th>
+                    ${question.options.map(opt => `<th>${opt.label}</th>`).join('')}
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="text-align: left; padding-left: 1rem;">Frequenza</td>
+                    ${question.options.map(opt => `
+                      <td>
+                        <input type="radio" name="${question.id}" value="${opt.value}" 
+                               onchange="selectFinalAnswer('${question.id}', '${opt.value}')"
+                               ${finalSurveyAnswers[question.id] === opt.value ? 'checked' : ''}>
+                      </td>
+                    `).join('')}
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="survey-buttons">
+              <button class="btn-survey btn-prev" onclick="prevFinalPage()" ${finalSurveyPage === 0 ? 'disabled' : ''}>
+                Indietro
+              </button>
+              <button class="btn-survey btn-next" onclick="nextFinalPage()" 
+                      ${!finalSurveyAnswers[question.id] ? 'disabled' : ''}>
+                Avanti
+              </button>
+            </div>
+          </div>
+        `;
+      } else if (finalSurveyPage === finalSurveyQuestions.length) {
+        main.innerHTML = `
+          <div class="survey-container">
+            <div class="survey-header">
+              <h1>VU VRIJE UNIVERSITEIT AMSTERDAM</h1>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${progressPercent}%"></div>
+            </div>
+            <div class="question-group">
+              <div class="question-title">Indica quanto sei d'accordo con ciascuna delle seguenti affermazioni:</div>
+              <table class="likert-table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    ${finalLikertScale.map((scale, i) => `<th>${scale}</th>`).join('')}
+                  </tr>
+                </thead>
+                <tbody>
+                  ${finalLikertQuestions.map(q => `
+                    <tr>
+                      <td>${q.text}</td>
+                      ${finalLikertScale.map((scale, i) => `
+                        <td>
+                          <input type="radio" name="${q.id}" value="${i}" 
+                                 onchange="selectFinalLikert('${q.id}', ${i})"
+                                 ${finalSurveyAnswers[q.id] == i ? 'checked' : ''}>
+                        </td>
+                      `).join('')}
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+            <div class="survey-buttons">
+              <button class="btn-survey btn-prev" onclick="prevFinalPage()">Indietro</button>
+              <button class="btn-survey btn-submit" onclick="completeFinalSurvey()" 
+                      ${!allFinalLikertAnswered() ? 'disabled' : ''}>
+                Avanti
+              </button>
+            </div>
+          </div>
+        `;
+      } else {
+        // Thank you page - this is where we save the data
+        main.innerHTML = `
+          <div class="survey-container">
+            <div class="survey-header">
+              <h1>VU VRIJE UNIVERSITEIT AMSTERDAM</h1>
+            </div>
+            <div style="text-align: center; padding: 3rem 2rem;">
+              <p style="font-size: 1.2rem; color: #666; line-height: 1.6; margin-bottom: 1rem;">
+                We thank you for your time spent taking this survey.
+              </p>
+              <p style="font-size: 1.2rem; color: #666; line-height: 1.6;">
+                Your response has been recorded.
+              </p>
+            </div>
+          </div>
+        `;
+        
+        // Save all data here
+        saveAllSurveyData();
+      }
+    }
+
+    function allFinalLikertAnswered() {
+      return finalLikertQuestions.every(q => finalSurveyAnswers[q.id] !== undefined);
+    }
+
+    function completeFinalSurvey() {
+      console.log('Final survey completed:', finalSurveyAnswers);
+      allSurveyData.finalSurvey = finalSurveyAnswers;
+      allSurveyData.finalSurveyCompletedAt = new Date().toISOString();
+      finalSurveyPage++;
+      renderFinalSurvey();
+    }
+
+    // Save data function
+    async function saveAllSurveyData() {
+      try {
+        allSurveyData.totalTimeSpent = Date.now() - surveyStartTime;
+        allSurveyData.completedAt = new Date().toISOString();
+        
+        const response = await fetch('/api/save-survey', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(allSurveyData)
+        });
+
+        const result = await response.json();
+        
+        if (result.success) {
+          console.log('Dati salvati con successo:', result);
+        } else {
+          console.error('Errore nel salvataggio:', result.error);
+        }
+      } catch (error) {
+        console.error('Errore nella chiamata API:', error);
+      }
     }
 
     // Global functions
@@ -1239,128 +1407,6 @@
         renderFinalSurvey();
       }
     };
-
-    // Final Survey functions
-
-    function renderFinalSurvey() {
-      const main = document.getElementById('main-content');
-      const totalPages = finalSurveyQuestions.length + 2; // +1 for likert, +1 for thank you
-      const progressPercent = (finalSurveyPage / totalPages) * 100;
-      
-      if (finalSurveyPage < finalSurveyQuestions.length) {
-        // Regular questions
-        const question = finalSurveyQuestions[finalSurveyPage];
-        main.innerHTML = `
-          <div class="survey-container">
-            <div class="survey-header">
-              <h1>VU VRIJE UNIVERSITEIT AMSTERDAM</h1>
-            </div>
-            <div class="progress-bar">
-              <div class="progress-fill" style="width: ${progressPercent}%"></div>
-            </div>
-            <div class="question-group">
-              <div class="question-title">${question.title}</div>
-              ${question.subtitle ? `<div style="font-style: italic; margin-bottom: 1rem; color: #555;">${question.subtitle}</div>` : ''}
-              <table class="likert-table" style="margin-top: 1.5rem;">
-                <thead>
-                  <tr>
-                    <th></th>
-                    ${question.options.map(opt => `<th>${opt.label}</th>`).join('')}
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td style="text-align: left; padding-left: 1rem;">Frequenza</td>
-                    ${question.options.map(opt => `
-                      <td>
-                        <input type="radio" name="${question.id}" value="${opt.value}" 
-                               onchange="selectFinalAnswer('${question.id}', '${opt.value}')"
-                               ${finalSurveyAnswers[question.id] === opt.value ? 'checked' : ''}>
-                      </td>
-                    `).join('')}
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="survey-buttons">
-              <button class="btn-survey btn-prev" onclick="prevFinalPage()" ${finalSurveyPage === 0 ? 'disabled' : ''}>
-                Indietro
-              </button>
-              <button class="btn-survey btn-next" onclick="nextFinalPage()" 
-                      ${!finalSurveyAnswers[question.id] ? 'disabled' : ''}>
-                Avanti
-              </button>
-            </div>
-          </div>
-        `;
-      } else if (finalSurveyPage === finalSurveyQuestions.length) {
-        // Likert scale page
-        main.innerHTML = `
-          <div class="survey-container">
-            <div class="survey-header">
-              <h1>VU VRIJE UNIVERSITEIT AMSTERDAM</h1>
-            </div>
-            <div class="progress-bar">
-              <div class="progress-fill" style="width: ${progressPercent}%"></div>
-            </div>
-            <div class="question-group">
-              <div class="question-title">Indica quanto sei d'accordo con ciascuna delle seguenti affermazioni:</div>
-              <table class="likert-table">
-                <thead>
-                  <tr>
-                    <th></th>
-                    ${finalLikertScale.map((scale, i) => `<th>${scale}</th>`).join('')}
-                  </tr>
-                </thead>
-                <tbody>
-                  ${finalLikertQuestions.map(q => `
-                    <tr>
-                      <td>${q.text}</td>
-                      ${finalLikertScale.map((scale, i) => `
-                        <td>
-                          <input type="radio" name="${q.id}" value="${i}" 
-                                 onchange="selectFinalLikert('${q.id}', ${i})"
-                                 ${finalSurveyAnswers[q.id] == i ? 'checked' : ''}>
-                        </td>
-                      `).join('')}
-                    </tr>
-                  `).join('')}
-                </tbody>
-              </table>
-            </div>
-            <div class="survey-buttons">
-              <button class="btn-survey btn-prev" onclick="prevFinalPage()">Indietro</button>
-              <button class="btn-survey btn-submit" onclick="nextFinalPage()" 
-                      ${!allFinalLikertAnswered() ? 'disabled' : ''}>
-                Avanti
-              </button>
-            </div>
-          </div>
-        `;
-      } else {
-        // Thank you page
-        main.innerHTML = `
-          <div class="survey-container">
-            <div class="survey-header">
-              <h1>VU VRIJE UNIVERSITEIT AMSTERDAM</h1>
-            </div>
-            <div style="text-align: center; padding: 3rem 2rem;">
-              <p style="font-size: 1.2rem; color: #666; line-height: 1.6; margin-bottom: 1rem;">
-                We thank you for your time spent taking this survey.
-              </p>
-              <p style="font-size: 1.2rem; color: #666; line-height: 1.6;">
-                Your response has been recorded.
-              </p>
-            </div>
-          </div>
-        `;
-        console.log('Final survey completed:', finalSurveyAnswers);
-      }
-    }
-
-    function allFinalLikertAnswered() {
-      return finalLikertQuestions.every(q => finalSurveyAnswers[q.id] !== undefined);
-    }
 
     // Initialize
     if (isInSurvey) {
