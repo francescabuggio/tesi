@@ -2,6 +2,17 @@ const fs = require('fs');
 const path = require('path');
 
 module.exports = function handler(req, res) {
+  // CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Handle preflight
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -9,19 +20,28 @@ module.exports = function handler(req, res) {
   try {
     const filePath = path.join(process.cwd(), 'data', 'surveys.json');
     
+    console.log('Checking file at:', filePath);
+    console.log('File exists:', fs.existsSync(filePath));
+    
     if (!fs.existsSync(filePath)) {
+      console.log('File not found, returning empty data');
       return res.status(200).json({ 
         success: true, 
         data: [],
         stats: {
           totalResponses: 0,
-          lastUpdate: null
+          lastUpdate: null,
+          ageDistribution: {},
+          genderDistribution: {},
+          averageCompletionTime: "Nessun dato"
         }
       });
     }
 
     const fileContent = fs.readFileSync(filePath, 'utf-8');
     const data = fileContent ? JSON.parse(fileContent) : [];
+
+    console.log('Data loaded, entries:', data.length);
 
     // Calcola statistiche base
     const stats = {
@@ -42,7 +62,8 @@ module.exports = function handler(req, res) {
     console.error('Errore nel leggere i dati:', error);
     res.status(500).json({ 
       success: false, 
-      error: 'Errore nel leggere i dati' 
+      error: error.message,
+      details: 'Errore nel leggere i dati'
     });
   }
 }
@@ -70,6 +91,16 @@ function calculateGenderDistribution(data) {
 }
 
 function calculateAverageTime(data) {
-  // Placeholder - potresti aggiungere tracking del tempo
-  return "Non ancora implementato";
+  if (data.length === 0) return "Nessun dato";
+  
+  const times = data
+    .filter(item => item.totalTimeSpent)
+    .map(item => item.totalTimeSpent);
+  
+  if (times.length === 0) return "Nessun dato";
+  
+  const avgMs = times.reduce((sum, time) => sum + time, 0) / times.length;
+  const avgMinutes = Math.round(avgMs / 60000);
+  
+  return `${avgMinutes} minuti`;
 } 
